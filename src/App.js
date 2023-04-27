@@ -15,7 +15,6 @@ function App() {
                     <Route path='*' element={<Navigate to='/config'/>}/>
                 </Routes>
             </main>
-            <Footer/>
         </div>
     );
 }
