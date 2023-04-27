@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import audioFile from '../demo_sounds/audio.mp3';
+import audioFile from '../demo_sounds/file_example_MP3_700KB.mp3';
 import { FaPlay } from 'react-icons/fa';
 
 export default function() {
