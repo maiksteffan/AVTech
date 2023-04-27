@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import audioFile from './audio.mp3';
+import audioFile from '../demo_sounds/audio.mp3';
 import { FaPlay } from 'react-icons/fa';
 
-function AudioPlayer() {
+export default function() {
     const [isPlaying, setIsPlaying] = useState(false);
     const audio = new Audio(audioFile);
 
