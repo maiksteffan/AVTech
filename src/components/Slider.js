@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import AudioPlayer from './AudioPlayer';
+import SliderStyles from './Slider.module.css'
 
 function Slider() {
     const [activePlayer, setActivePlayer] = useState(1);
@@ -17,8 +17,8 @@ function Slider() {
                 </button>
             </div>
             <div>
-                {activePlayer === 1 && <AudioPlayer />}
-                {activePlayer === 2 && <AudioPlayer />}
+                {activePlayer === 1 && ""}
+                {activePlayer === 2 && ""}
             </div>
         </div>
     );
