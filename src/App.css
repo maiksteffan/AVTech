@@ -1,1 +1,22 @@
-
+body {
+    background-color: #16161F;
+    padding-top: 20px;
+  }
+  
+  .green-text {
+    color: #0AC97A;
+  }
+  
+  .dj-controller-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    height: 50vh;
+    width: 100vw;
+    margin: auto;
+  }
+  
+  .dj-controller-bottom {
+    display: flex;
+  }
+  

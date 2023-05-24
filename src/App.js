@@ -4,6 +4,7 @@ import Config from "./pages/ConfigPage";
 import DJTool from "./pages/DjVjPage";
 import DjVjPage from "./pages/DjVjPage";
 import ConfigPage from "./pages/ConfigPage";
+import './App.css';
 
 function App() {
     return (
