@@ -1,4 +1,4 @@
-import "./Controller.module.css";
+import "./Controller.css";
 import { useState } from "react";
 import { Knob } from 'primereact/knob';
 
