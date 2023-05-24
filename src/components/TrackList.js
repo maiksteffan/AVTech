@@ -1,4 +1,4 @@
-import TracklistStyles from './TrackList.module.css'
+import './TrackList.css'
 
 function Tracklist(props) {
   

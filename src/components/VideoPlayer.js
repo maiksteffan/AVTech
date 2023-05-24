@@ -1,4 +1,4 @@
-import VideoPlayerStyles from './VideoPlayer.module.css'
+import './VideoPlayer.css'
 
 function VideoPlayer(props){
     return (

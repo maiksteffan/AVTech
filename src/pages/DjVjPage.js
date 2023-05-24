@@ -5,6 +5,7 @@ import Tracklist from "./../components/Tracklist";
 import Controller from "./../components/Controller";
 import "primereact/resources/themes/lara-light-indigo/theme.css";    
 import "primereact/resources/primereact.min.css";
+import "./../App.css";
 
 export default function DJVJTool() {
   const [volumeLeft, setVolumeLeft] = useState(0);
