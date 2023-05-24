@@ -1,4 +1,4 @@
-import "./turntable.module.css";
+import "./Turntable.module.css";
 import sampleSoundwave from "./../assets/soundwave.PNG";
 import sampleImg from "./../assets/sampleImg.png";
 import { useRef, useState, useEffect } from "react";
