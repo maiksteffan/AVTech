@@ -47,7 +47,7 @@ export default function DJVJTool() {
           backgroundImg="./../assets/sampleImg.png"
           volume={volumeLeft}
         />
-        <VideoPlayer />
+        <VideoPlayer videoUrl="https://media.istockphoto.com/id/1371473504/video/4k-video-of-flowing-binary-code-in-green-color.mp4?s=mp4-640x640-is&k=20&c=Na3PSkNBQsfJY3I0U58mJ25PEeiFUokeQNj1FAoTI8Y=" />
         <Turntable
           id="right"
           backgroundImg="./../assets/sampleImg2.png"
