@@ -5,14 +5,12 @@ import { useRef, useState, useEffect } from "react";
 
 function Turntable({ id, backgroundImg = "./../assets/sampleImg.png", track, volume }) {
   const [isPaused, setIsPaused] = useState(true);
-  const audioRef = useRef(null);
   const discClass = `disc-${id}`;
 
   function togglePause() {
     const disc = document.querySelector(`.${discClass}`);
     disc.classList.toggle("spinning");
     setIsPaused(!isPaused);
-    isPaused ? audioRef.current.play() : audioRef.current.pause();
   }
 
   return (
@@ -41,7 +39,6 @@ function Turntable({ id, backgroundImg = "./../assets/sampleImg.png", track, vol
         <h1>120 BPM</h1>
       </div>
 
-      <audio ref={audioRef} src="./assets/demoSong1.mp3"></audio>
     </div>
   );
 }
