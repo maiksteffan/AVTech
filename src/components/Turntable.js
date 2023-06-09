@@ -11,6 +11,7 @@ function Turntable({ id, backgroundImg = "./../assets/sampleImg.png", url }) {
   const [audioLoaded, setAudioLoaded] = useState(false);
   const [audioSource, setAudioSource] = useState(null);
   const [audioBuffer, setAudioBuffer] = useState(null);
+  const [bpm, setBpm] = useState(0);
 
   useEffect(() => {
     audioLogic.loadAudio(url)
@@ -51,6 +52,11 @@ function Turntable({ id, backgroundImg = "./../assets/sampleImg.png", url }) {
   
     if (isPaused) {
       createNewSourceNode();
+
+      let obj = audioLogic.getBPM(audioBuffer);
+      obj.then((bpm) => {
+        setBpm(bpm.bpm);
+      });
     } else {
       audioSource.stop();
       audioLogic.disconnectAudioSource(audioSource);
@@ -82,7 +88,7 @@ function Turntable({ id, backgroundImg = "./../assets/sampleImg.png", url }) {
             </div>
           )}
         </div>
-        <h1>120 BPM</h1>
+        <h1 className="digital">{bpm} BPM</h1>
       </div>
 
     </div>

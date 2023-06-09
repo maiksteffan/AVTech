@@ -1,3 +1,5 @@
+import { guess } from 'web-audio-beat-detector';
+
 class AudioLogic {
   constructor() {
     this.audioContext = new AudioContext();
@@ -33,6 +35,10 @@ class AudioLogic {
 
   pause() {
     this.isPlaying = false;
+  }
+
+  getBPM(audioSource) {
+    return guess(audioSource);
   }
 
   connectAudioSource(source, channel) {
