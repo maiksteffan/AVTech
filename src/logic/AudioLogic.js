@@ -11,7 +11,7 @@ class AudioLogic {
     }
   
     play() {
-      // Start the audio context if it's not already running
+      // Start the audio context if not already running
       if (this.audioContext.state === 'suspended') {
         this.audioContext.resume();
       }
@@ -31,3 +31,4 @@ class AudioLogic {
       source.disconnect();
     }
   }  
+  export default AudioLogic;
