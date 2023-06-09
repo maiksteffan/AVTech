@@ -1,3 +1,15 @@
+@font-face {
+  font-family: 'DS-DIGI';
+  src: url('./assets/DS-DIGIB.TTF') format('truetype');
+}
+
+/* Apply the custom font to desired elements */
+.digital {
+  font-family: 'DS-DIGI', sans-serif;
+  color: cyan;
+  font-size: 2.5rem;
+}
+
 body {
     background-color: #16161F;
     padding-top: 20px;
