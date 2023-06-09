@@ -1,6 +1,7 @@
 import "./Controller.css";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { Knob } from 'primereact/knob';
+import {AudioLogicContext} from './../logic/AudioLogicContext';
 
 function Controller(props) {
   const [crossfade, setCrossfade] = useState(50);
@@ -14,6 +15,7 @@ function Controller(props) {
   const [knob6Value, setKnob6Value] = useState(0);
   const [knob7Value, setKnob7Value] = useState(0);
   const [knob8Value, setKnob8Value] = useState(0);
+  const audioLogic = useContext(AudioLogicContext);
 
   function handleCrossfadeChange(event) {
     setCrossfade(event.target.value);
@@ -21,10 +23,12 @@ function Controller(props) {
 
   function handleVolumeLeftChange(event) {
     setVolumeLeft(event.target.value);
+    audioLogic.gainNodeLeft.gain.value = event.target.value;
   }
 
   function handleVolumeRightChange(event) {
     setVolumeRight(event.target.value);
+    audioLogic.gainNodeRight.gain.value = event.target.value;
   }
 
   return (

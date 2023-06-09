@@ -37,7 +37,7 @@ function Turntable({ id, backgroundImg = "./../assets/sampleImg.png", url }) {
     const sourceNode = audioLogic.audioContext.createBufferSource();
     sourceNode.buffer = audioBuffer;
     setAudioSource(sourceNode);
-    audioLogic.connectAudioSource(sourceNode);
+    audioLogic.connectAudioSource(sourceNode, id);
     sourceNode.start();
   }
 
