@@ -8,6 +8,12 @@ class AudioLogic {
     this.gainNodeRight = this.audioContext.createGain();
     this.gainNodeLeft.connect(this.audioContext.destination);
     this.gainNodeRight.connect(this.audioContext.destination);
+
+    // Create analyzer nodes for each channel and connect them to the gain nodes
+    this.analyserNodeLeft = this.audioContext.createAnalyser();
+    this.analyserNodeRight = this.audioContext.createAnalyser();
+    this.analyserNodeLeft.connect(this.gainNodeLeft);
+    this.analyserNodeRight.connect(this.gainNodeRight);
   }
 
   loadAudio(url) {
@@ -31,10 +37,10 @@ class AudioLogic {
 
   connectAudioSource(source, channel) {
     if (channel === "left") {
-      source.connect(this.gainNodeLeft);
+      source.connect(this.analyserNodeLeft);
       return;
     }
-    source.connect(this.gainNodeRight);
+    source.connect(this.analyserNodeRight);
   }
 
   disconnectAudioSource(source) {
