@@ -48,9 +48,9 @@ function Controller(props) {
         <input
           type="range"
           min="0"
-          max="100"
+          max="1"
           value={volumeLeft}
-          step="1"
+          step="0.1"
           onChange={handleVolumeLeftChange}
           className="volume-controller"
         />
@@ -67,9 +67,9 @@ function Controller(props) {
         <input
           type="range"
           min="0"
-          max="100"
+          max="1"
           value={volumeRight}
-          step="1"
+          step="0.1"
           onChange={handleVolumeRightChange}
           className="volume-controller"
         />
