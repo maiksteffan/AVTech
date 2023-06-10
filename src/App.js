@@ -5,7 +5,8 @@ import DJTool from "./pages/DjVjPage";
 import DjVjPage from "./pages/DjVjPage";
 import ConfigPage from "./pages/ConfigPage";
 import "primereact/resources/themes/md-dark-indigo/theme.css";     
-import "primereact/resources/primereact.min.css";                                       
+import "primereact/resources/primereact.min.css";  
+import 'primeicons/primeicons.css';                                     
 import "./App.css";
 
 function App() {
