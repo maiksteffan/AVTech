@@ -1,11 +1,13 @@
 import { guess } from 'web-audio-beat-detector';
 
 class AudioLogic {
+
   constructor() {
     this.audioContext = new AudioContext();
     this.isPlaying = false;
     this.audioBufferLeft = null;
     this.audioBufferRight = null;
+    this.audioBufferList = [];
 
     // Create a gain node for each channel and connect them to the destination
     this.gainNodeLeft = this.audioContext.createGain();
@@ -25,6 +27,24 @@ class AudioLogic {
       .then((response) => response.arrayBuffer())
       .then((arrayBuffer) => this.audioContext.decodeAudioData(arrayBuffer));
   }
+
+  //load audio from file upload
+  loadAudioFile(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsArrayBuffer(file);
+      reader.onload = () => {
+        this.audioContext.decodeAudioData(reader.result).then((audioBuffer) => {
+          const fileNameWithoutFormat = file.name.split('.').slice(0, -1).join('.');
+          this.audioBufferList.push({buffer: audioBuffer, name: fileNameWithoutFormat});
+          resolve(audioBuffer);
+        });
+      };
+      reader.onerror = reject;
+    });
+  }
+
+
 
   /**
    * Plays the audio context if it is not already playing.
@@ -82,6 +102,17 @@ class AudioLogic {
    */
   disconnectAudioSource(source) {
     source.disconnect();
+  }
+
+  //function that gets the length of the song in minutes
+  getSongLength(audioBuffer) {
+    let duration = audioBuffer.duration;
+    let minutes = Math.floor(duration / 60);
+    let seconds = Math.floor(duration % 60);
+    if (seconds < 10) {
+      seconds = "0" + seconds;
+    }
+    return minutes + ":" + seconds;
   }
 
   /**
