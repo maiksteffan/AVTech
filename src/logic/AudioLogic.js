@@ -4,6 +4,8 @@ class AudioLogic {
   constructor() {
     this.audioContext = new AudioContext();
     this.isPlaying = false;
+    this.audioBufferLeft = null;
+    this.audioBufferRight = null;
 
     // Create a gain node for each channel and connect them to the destination
     this.gainNodeLeft = this.audioContext.createGain();
@@ -52,6 +54,14 @@ class AudioLogic {
     return guess(audioSource);
   }
 
+  setAudioBuffer(audioBuffer, channel) {
+    if (channel === "left") {
+      this.audioBufferLeft = audioBuffer;
+      return;
+    }
+    this.audioBufferRight = audioBuffer;
+  }
+
   /**
    * Connects the audio source to the specified channel.
    * @param {*} source audio source to connect
@@ -86,5 +96,26 @@ class AudioLogic {
     this.gainNodeLeft.gain.value = gain1;
     this.gainNodeRight.gain.value = gain2;
   }
+
+  matchBpm(channel, source) {
+    if (!this.audioBufferLeft || !this.audioBufferRight) {
+      return;
+    }
+  
+    const targetBpmBuffer = channel === "left" ? this.audioBufferRight : this.audioBufferLeft;
+    const sourceBpmBuffer = channel === "left" ? this.audioBufferLeft : this.audioBufferRight;
+  
+    const targetBpmPromise = this.getBPM(targetBpmBuffer);
+    const sourceBpmPromise = this.getBPM(sourceBpmBuffer);
+  
+    Promise.all([targetBpmPromise, sourceBpmPromise]).then(([targetBpmResult, sourceBpmResult]) => {
+      const targetBpm = targetBpmResult.bpm;
+      const sourceBpm = sourceBpmResult.bpm;
+  
+      const ratio = targetBpm / sourceBpm;
+      console.log(ratio);
+      source.playbackRate.value = ratio;
+    });
+  }  
 }
 export default AudioLogic;

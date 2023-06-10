@@ -24,6 +24,7 @@ function Turntable({ id, backgroundImg = "./../assets/sampleImg.png", url }) {
       .then((audioBuffer) => {
         setAudioBuffer(audioBuffer);
         setAudioLoaded(true);
+        audioLogic.setAudioBuffer(audioBuffer, id);
       })
       .catch((error) => {
         console.error("Error loading audio file:", error);
@@ -59,8 +60,8 @@ function Turntable({ id, backgroundImg = "./../assets/sampleImg.png", url }) {
     if (isPaused) {
       createNewSourceNode();
 
-      let obj = audioLogic.getBPM(audioBuffer);
-      obj.then((bpm) => {
+      let promise = audioLogic.getBPM(audioBuffer);
+      promise.then((bpm) => {
         setBpm(bpm.bpm);
       });
     } else {
@@ -75,6 +76,8 @@ function Turntable({ id, backgroundImg = "./../assets/sampleImg.png", url }) {
     if (!audioLoaded) {
       return;
     }
+
+    audioLogic.matchBpm(id, audioSource)
 
     setIsSynchronized(!isSynchronized);
   }
