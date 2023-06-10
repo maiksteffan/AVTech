@@ -4,7 +4,7 @@ import { Knob } from 'primereact/knob';
 import {AudioLogicContext} from './../logic/AudioLogicContext';
 
 function Controller(props) {
-  const [crossfade, setCrossfade] = useState(0);
+  const [crossfade, setCrossfade] = useState(0.5);
   const [volumeLeft, setVolumeLeft] = useState(0.5);
   const [volumeRight, setVolumeRight] = useState(0.5);
   const [knob1Value, setKnob1Value] = useState(0);
