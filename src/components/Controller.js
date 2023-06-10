@@ -4,7 +4,7 @@ import { Knob } from 'primereact/knob';
 import {AudioLogicContext} from './../logic/AudioLogicContext';
 
 function Controller(props) {
-  const [crossfade, setCrossfade] = useState(50);
+  const [crossfade, setCrossfade] = useState(0);
   const [volumeLeft, setVolumeLeft] = useState(0.5);
   const [volumeRight, setVolumeRight] = useState(0.5);
   const [knob1Value, setKnob1Value] = useState(0);
@@ -19,6 +19,9 @@ function Controller(props) {
 
   function handleCrossfadeChange(event) {
     setCrossfade(event.target.value);
+    audioLogic.crossfade(event.target.value);
+    setVolumeLeft(1 - event.target.value);
+    setVolumeRight(event.target.value);
   }
 
   function handleVolumeLeftChange(event) {
@@ -37,9 +40,9 @@ function Controller(props) {
         <input
           type="range"
           min="0"
-          max="100"
+          max="1"
           value={crossfade}
-          step="1"
+          step="0.01"
           onChange={handleCrossfadeChange}
           className="cross-fader"
         />
@@ -50,7 +53,7 @@ function Controller(props) {
           min="0"
           max="1"
           value={volumeLeft}
-          step="0.1"
+          step="0.01"
           onChange={handleVolumeLeftChange}
           className="volume-controller"
         />
@@ -69,7 +72,7 @@ function Controller(props) {
           min="0"
           max="1"
           value={volumeRight}
-          step="0.1"
+          step="0.01"
           onChange={handleVolumeRightChange}
           className="volume-controller"
         />

@@ -24,6 +24,9 @@ class AudioLogic {
       .then((arrayBuffer) => this.audioContext.decodeAudioData(arrayBuffer));
   }
 
+  /**
+   * Plays the audio context if it is not already playing.
+   */
   play() {
     // Start the audio context if not already running
     if (this.audioContext.state === "suspended") {
@@ -33,14 +36,28 @@ class AudioLogic {
     this.isPlaying = true;
   }
 
+  /**
+   * Pauses the audio context if it is playing.
+   */
   pause() {
     this.isPlaying = false;
   }
 
+  /**
+   * Returns the BPM & offset of the audio source.
+   * @param {*} audioSource 
+   * @returns promise that resolves to an object with bpm and offset properties
+   */
   getBPM(audioSource) {
     return guess(audioSource);
   }
 
+  /**
+   * Connects the audio source to the specified channel.
+   * @param {*} source audio source to connect
+   * @param {*} channel channel to connect to ("left" or "right")
+   * @returns 
+   */
   connectAudioSource(source, channel) {
     if (channel === "left") {
       source.connect(this.analyserNodeLeft);
@@ -49,8 +66,25 @@ class AudioLogic {
     source.connect(this.analyserNodeRight);
   }
 
+  /**
+   * Disconnects the audio source.
+   * @param {*} source audio source to disconnect
+   */
   disconnectAudioSource(source) {
     source.disconnect();
+  }
+
+  /**
+   * Crossfades between the left and right channels.
+   * @param {*} value value between 0 and 1 (0 = left, 1 = right)
+   */
+  crossfade(value) {
+    // Use an equal-power crossfading curve:
+    const gain1 = Math.cos(value * 0.5 * Math.PI);
+    const gain2 = Math.cos((1.0 - value) * 0.5 * Math.PI);
+
+    this.gainNodeLeft.gain.value = gain1;
+    this.gainNodeRight.gain.value = gain2;
   }
 }
 export default AudioLogic;
