@@ -7,8 +7,8 @@ function Tracklist() {
 
   return (
     <div className="tracklist-container">
-      <h2 className="tracklist-heading">Tracklist</h2>
-      <ul>
+      <h2 className="tracklist-heading font-bold my-3">Tracklist</h2>
+      <ul className="text-center">
         {audioLogic.audioBufferList &&
           audioLogic.audioBufferList.map((audioBuffer, index) => (
             <li className="track" key={index}>
