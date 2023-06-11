@@ -18,6 +18,10 @@ body {
   .green-text {
     color: #0AC97A;
   }
+
+  .green-border {
+    border-color: #0AC97A;
+  }
   
   .dj-controller-container {
     display: flex;
