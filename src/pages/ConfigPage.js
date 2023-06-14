@@ -2,6 +2,7 @@ import React, { useState, useContext } from "react";
 import { FileUpload } from "primereact/fileupload";
 import { AudioLogicContext } from "./../logic/AudioLogicContext";
 import { Link } from "react-router-dom";
+import { Button } from "primereact/button";
 
 export default function () {
   const audioLogic = useContext(AudioLogicContext);
@@ -32,7 +33,9 @@ export default function () {
           <p className="m-0">Drag and drop files to here to upload.</p>
         }
       />
-        <Link to="/dj-vj-tool"><a>Test</a></Link>
+      <div className="mt-10">
+        <Link to="/dj-vj-tool"><Button label="Continue" outlined /></Link>
+        </div>
     </div>
   );
 }
