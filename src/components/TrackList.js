@@ -1,9 +1,16 @@
 import "./TrackList.css";
 import React, { useContext } from "react";
 import { AudioLogicContext } from "./../logic/AudioLogicContext";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCirclePlay} from "@fortawesome/free-solid-svg-icons";
 
-function Tracklist() {
+function Tracklist(props) {
   const audioLogic = useContext(AudioLogicContext);
+
+  function handlePlay(buffer, id) {
+    audioLogic.setAudioBuffer(buffer, props.id);
+    props.setAudioBuffer(buffer);
+  }
 
   return (
     <div className="tracklist-container">
@@ -14,6 +21,9 @@ function Tracklist() {
             <li className="track" key={index}>
               {audioBuffer.name} -{" "}
               {audioLogic.getSongLength(audioBuffer.buffer)}
+              <a onClick={() => handlePlay(audioBuffer, props.id)}  className="ml-2 ">
+                <FontAwesomeIcon icon={faCirclePlay} style={{color: "#0ac97a",}} />
+              </a>
             </li>
           ))}
       </ul>
