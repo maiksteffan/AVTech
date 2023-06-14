@@ -9,12 +9,14 @@ import sampleImg from "./../assets/sampleImg.png";
 function Turntable({ id, buffer }) {
   const [isPaused, setIsPaused] = useState(true);
   const [isSynchronized, setIsSynchronized] = useState(false);
-  const discClass = `disc-${id}`;
   const audioLogic = useContext(AudioLogicContext);
   const [audioLoaded, setAudioLoaded] = useState(false);
   const [audioSource, setAudioSource] = useState(null);
   const [audioBuffer, setAudioBuffer] = useState(audioLogic.getAudioBuffer(id));
   const [bpm, setBpm] = useState(0);
+  const [length, setLength] = useState(0);
+  const [time, setTime] = useState(0);
+  const discClass = `disc-${id}`;
 
   /*
     * useEffect hook that is called when the audio buffer is changed.
@@ -38,9 +40,32 @@ function Turntable({ id, buffer }) {
     //if the audio buffer is null, then the audio is won't be set to loaded
     if (audioBuffer) {
       setAudioLoaded(true);
+      setLength(audioLogic.getSongLength(audioBuffer.buffer));
       return;
     }
   }, [buffer]);
+
+  useEffect(() => {
+    if (!audioLoaded || !audioSource || isPaused) {
+      return;
+    }
+  
+    const interval = setInterval(() => {
+      setTime(prevTime => prevTime + 1);
+    }, 1000); 
+  
+    return () => {
+      clearInterval(interval);
+    };
+  }, [audioLoaded, audioSource, isPaused]);
+
+  //function that returns the time in the format of mm:ss
+  function getTime() {
+    const minutes = Math.floor(time / 60);
+    const seconds = time % 60;
+    return `${minutes}:${seconds < 10 ? "0" + seconds : seconds}`;
+  }
+
 
   /**
    * Function that creates a new source node with the audio buffer set 
@@ -74,6 +99,7 @@ function Turntable({ id, buffer }) {
       audioLogic.getBPM(audioBuffer.buffer).then((bpm) => {
         setBpm(bpm.bpm);
       });
+      setTime(0);
     } else {
       audioSource.stop();
       audioLogic.disconnectAudioSource(audioSource);
@@ -111,6 +137,7 @@ function Turntable({ id, buffer }) {
         <img src={sampleImg} />
       </div>
 
+      {audioBuffer && <h1 className="green-text mt-[15px]">{audioBuffer.name} - {getTime()}/{length}</h1>}
       <div className="bpm-display">
         <div className="round-button" onClick={togglePause}>
           {!isPaused && <FontAwesomeIcon icon={faPause} size="xl" />}
@@ -122,7 +149,6 @@ function Turntable({ id, buffer }) {
           {isSynchronized && <FontAwesomeIcon icon={faRotate} size="xl" spin />}
         </div>
       </div>
-      {audioBuffer && <h1>Currently Playing: {audioBuffer.name}</h1>}
     </div>
   );
 }
