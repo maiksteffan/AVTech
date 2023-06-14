@@ -1,23 +1,12 @@
+import React, { useContext, useEffect, useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlay, faPause, faRotate } from "@fortawesome/free-solid-svg-icons";
+import { AudioLogicContext } from "./../logic/AudioLogicContext";
 import "./Turntable.css";
 import sampleSoundwave from "./../assets/soundwave.PNG";
 import sampleImg from "./../assets/sampleImg.png";
-import React, {
-  useContext,
-  useEffect,
-  useState,
-  componentDidUpdate,
-} from "react";
-import { AudioLogicContext } from "./../logic/AudioLogicContext";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlay } from "@fortawesome/free-solid-svg-icons";
-import { faPause } from "@fortawesome/free-solid-svg-icons";
-import { faRotate } from "@fortawesome/free-solid-svg-icons";
 
-function Turntable({
-  id,
-  backgroundImg = "./../assets/sampleImg.png",
-  buffer,
-}) {
+function Turntable({ id, buffer }) {
   const [isPaused, setIsPaused] = useState(true);
   const [isSynchronized, setIsSynchronized] = useState(false);
   const discClass = `disc-${id}`;
@@ -27,6 +16,12 @@ function Turntable({
   const [audioBuffer, setAudioBuffer] = useState(audioLogic.getAudioBuffer(id));
   const [bpm, setBpm] = useState(0);
 
+  /*
+    * useEffect hook that is called when the audio buffer is changed.
+    * If the audio buffer is null, then the audio is won't be set to loaded.
+    * If the audio buffer is not null, then the audio is set to loaded.
+    * If the audio source is not null, then the audio source is stopped and disconnected from the audio context.
+  */
   useEffect(() => {
     //stop audioSource when song is changed while playing
     if (audioSource) {
@@ -37,18 +32,25 @@ function Turntable({
       disc.classList.toggle("spinning");
     }
 
+    //sets the audio buffer to the passed in buffer
     setAudioBuffer(buffer);
+
+    //if the audio buffer is null, then the audio is won't be set to loaded
     if (audioBuffer) {
       setAudioLoaded(true);
       return;
     }
   }, [buffer]);
 
+  /**
+   * Function that creates a new source node with the audio buffer set 
+   * to the audio buffer of this turntable.
+   * @returns a new source node with the audio buffer set to the audio buffer of this turntable
+   */
   function createNewSourceNode() {
     if (!audioLoaded || !audioBuffer) {
       return;
     }
-
     const sourceNode = audioLogic.audioContext.createBufferSource();
     sourceNode.buffer = audioBuffer.buffer;
     setAudioSource(sourceNode);
@@ -56,19 +58,20 @@ function Turntable({
     sourceNode.start();
   }
 
+  /**
+   * Function that toggles the pause state of the turntable.
+   * If the turntable is paused, a new source node will be created and connected to the audio context.
+   * If the turntable is playing, the source will be stopped and disconnected from the audio context
+   * @returns None
+   */
   function togglePause() {
     if (!audioLoaded || !buffer) {
       return;
     }
 
-    const disc = document.querySelector(`.${discClass}`);
-    disc.classList.toggle("spinning");
-
     if (isPaused) {
       createNewSourceNode();
-
-      let promise = audioLogic.getBPM(audioBuffer.buffer);
-      promise.then((bpm) => {
+      audioLogic.getBPM(audioBuffer.buffer).then((bpm) => {
         setBpm(bpm.bpm);
       });
     } else {
@@ -76,6 +79,9 @@ function Turntable({
       audioLogic.disconnectAudioSource(audioSource);
     }
 
+    //toggle the spinning animation
+    const disc = document.querySelector(`.${discClass}`);
+    disc.classList.toggle("spinning");
     setIsPaused(!isPaused);
   }
 
@@ -120,5 +126,4 @@ function Turntable({
     </div>
   );
 }
-
 export default Turntable;

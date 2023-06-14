@@ -1,5 +1,8 @@
 import { guess } from 'web-audio-beat-detector';
 
+/**
+ * Class that handles the audio logic.
+ */
 class AudioLogic {
 
   constructor() {
@@ -22,13 +25,10 @@ class AudioLogic {
     this.analyserNodeRight.connect(this.gainNodeRight);
   }
 
-  loadAudio(url) {
-    return fetch(url)
-      .then((response) => response.arrayBuffer())
-      .then((arrayBuffer) => this.audioContext.decodeAudioData(arrayBuffer));
-  }
-
-  //load audio from file upload
+  /**
+   * Function that loads an audio file and coverts it to an audio buffer, which is then stored in the audio buffer list.
+   * @param {*} file audio file to load
+   */
   loadAudioFile(file) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -59,7 +59,6 @@ class AudioLogic {
     if (this.audioContext.state === "suspended") {
       this.audioContext.resume();
     }
-
     this.isPlaying = true;
   }
 
@@ -72,28 +71,35 @@ class AudioLogic {
 
   /**
    * Returns the BPM & offset of the audio source.
-   * @param {*} audioSource 
+   * @param {*} audioSource audio source to get the BPM & offset from
    * @returns promise that resolves to an object with bpm and offset properties
    */
   getBPM(audioSource) {
     return guess(audioSource);
   }
 
+  /**
+   * Function that sets the audio buffer for the specified channel. 
+   * @param {*} audioBuffer audio buffer to set
+   * @param {*} channel channel to set the audio buffer for ("left" or "right")
+   */
   setAudioBuffer(audioBuffer, channel) {
     return new Promise((resolve, reject) => {
-      console.log("Setting audio buffer");
       if (channel === "left") {
         this.audioBufferLeft = audioBuffer;
-        console.log(this.audioBufferLeft);
         resolve();
       } else {
         this.audioBufferRight = audioBuffer;
-        console.log(this.audioBufferRight);
         resolve();
       }
     });
   }
 
+  /**
+   * Function that gets the audio buffer for the specified channel.
+   * @param {*} channel channel to get the audio buffer from ("left" or "right")
+   * @returns the audio buffer for the specified channel
+   */
   getAudioBuffer(channel) {
     if (channel === "left") {
       return this.audioBufferLeft;
@@ -105,7 +111,6 @@ class AudioLogic {
    * Connects the audio source to the specified channel.
    * @param {*} source audio source to connect
    * @param {*} channel channel to connect to ("left" or "right")
-   * @returns 
    */
   connectAudioSource(source, channel) {
     if (channel === "left") {
@@ -151,6 +156,12 @@ class AudioLogic {
     this.gainNodeRight.gain.value = gain2;
   }
 
+  /**
+   * Function that matches the BPM of the source to the target.
+   * @param {*} channel channel to match the BPM of ("left" or "right")
+   * @param {*} source audio source to match the BPM of 
+   * @returns a promise that resolves to the updated BPM
+   */
   matchBpm(channel, source) {
     if (!this.audioBufferLeft || !this.audioBufferRight) {
       return Promise.resolve(null);
