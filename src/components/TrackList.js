@@ -13,7 +13,7 @@ function Tracklist(props) {
   }
 
   return (
-    <div className="tracklist-container">
+    <div className="tracklist-container mt-10">
       <h2 className="tracklist-heading font-bold my-3">Tracklist</h2>
       <ul className="text-center">
         {audioLogic.audioBufferList &&
