@@ -38,6 +38,11 @@ class AudioLogic {
           const fileNameWithoutFormat = file.name.split('.').slice(0, -1).join('.');
           this.audioBufferList.push({buffer: audioBuffer, name: fileNameWithoutFormat});
           resolve(audioBuffer);
+          if (this.audioBufferLeft === null) {
+          this.setAudioBuffer({buffer: audioBuffer, name: fileNameWithoutFormat}, "left");
+          } else if (this.audioBufferRight === null) {
+            this.setAudioBuffer({buffer: audioBuffer, name: fileNameWithoutFormat}, "right");
+          }
         });
       };
       reader.onerror = reject;
@@ -75,11 +80,25 @@ class AudioLogic {
   }
 
   setAudioBuffer(audioBuffer, channel) {
+    return new Promise((resolve, reject) => {
+      console.log("Setting audio buffer");
+      if (channel === "left") {
+        this.audioBufferLeft = audioBuffer;
+        console.log(this.audioBufferLeft);
+        resolve();
+      } else {
+        this.audioBufferRight = audioBuffer;
+        console.log(this.audioBufferRight);
+        resolve();
+      }
+    });
+  }
+
+  getAudioBuffer(channel) {
     if (channel === "left") {
-      this.audioBufferLeft = audioBuffer;
-      return;
+      return this.audioBufferLeft;
     }
-    this.audioBufferRight = audioBuffer;
+    return this.audioBufferRight;
   }
 
   /**
@@ -104,7 +123,11 @@ class AudioLogic {
     source.disconnect();
   }
 
-  //function that gets the length of the song in minutes
+  /**
+   * Gets the song length in minutes and seconds.
+   * @param {*} audioBuffer  
+   * @returns a string with the length in the format "minutes:seconds"
+   */
   getSongLength(audioBuffer) {
     let duration = audioBuffer.duration;
     let minutes = Math.floor(duration / 60);
@@ -130,22 +153,22 @@ class AudioLogic {
 
   matchBpm(channel, source) {
     if (!this.audioBufferLeft || !this.audioBufferRight) {
-      return;
+      return Promise.resolve(null);
     }
   
-    const targetBpmBuffer = channel === "left" ? this.audioBufferRight : this.audioBufferLeft;
-    const sourceBpmBuffer = channel === "left" ? this.audioBufferLeft : this.audioBufferRight;
+    const targetBpmBuffer = channel === "left" ? this.audioBufferRight.buffer : this.audioBufferLeft.buffer;
+    const sourceBpmBuffer = channel === "left" ? this.audioBufferLeft.buffer : this.audioBufferRight.buffer;
   
     const targetBpmPromise = this.getBPM(targetBpmBuffer);
     const sourceBpmPromise = this.getBPM(sourceBpmBuffer);
   
-    Promise.all([targetBpmPromise, sourceBpmPromise]).then(([targetBpmResult, sourceBpmResult]) => {
+    return Promise.all([targetBpmPromise, sourceBpmPromise]).then(([targetBpmResult, sourceBpmResult]) => {
       const targetBpm = targetBpmResult.bpm;
       const sourceBpm = sourceBpmResult.bpm;
   
       const ratio = targetBpm / sourceBpm;
-      console.log(ratio);
       source.playbackRate.value = ratio;
+      return targetBpm;
     });
   }  
 }
