@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
 import VideoPlayer from "./../components/VideoPlayer";
 import Turntable from "./../components/Turntable";
-import Tracklist from "./../components/Tracklist";
+import Tracklist from "./../components/TrackList";
 import Controller from "./../components/Controller";
 import "primereact/resources/themes/lara-light-indigo/theme.css";
 import "primereact/resources/primereact.min.css";
