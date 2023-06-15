@@ -9,44 +9,30 @@ import sampleImg from "./../assets/sampleImg.png";
 function Turntable({ id, buffer }) {
   const [isPaused, setIsPaused] = useState(true);
   const [isSynchronized, setIsSynchronized] = useState(false);
-  const audioLogic = useContext(AudioLogicContext);
   const [audioLoaded, setAudioLoaded] = useState(false);
-  const [audioSource, setAudioSource] = useState(null);
-  const [audioBuffer, setAudioBuffer] = useState(audioLogic.getAudioBuffer(id));
+  const audioLogic = useContext(AudioLogicContext);
   const [bpm, setBpm] = useState(0);
   const [length, setLength] = useState(0);
   const [time, setTime] = useState(0);
   const discClass = `disc-${id}`;
 
-  /*
-    * useEffect hook that is called when the audio buffer is changed.
-    * If the audio buffer is null, then the audio is won't be set to loaded.
-    * If the audio buffer is not null, then the audio is set to loaded.
-    * If the audio source is not null, then the audio source is stopped and disconnected from the audio context.
-  */
   useEffect(() => {
     //stop audioSource when song is changed while playing
-    if (audioSource) {
-      audioSource.stop();
-      audioLogic.disconnectAudioSource(audioSource);
+    if (!isPaused) {
       setIsPaused(true);
+      audioLogic.pauseSong(id);
       const disc = document.querySelector(`.${discClass}`);
       disc.classList.toggle("spinning");
     }
 
-    //sets the audio buffer to the passed in buffer
-    setAudioBuffer(buffer);
-
-    //if the audio buffer is null, then the audio is won't be set to loaded
-    if (audioBuffer) {
+    if (audioLogic.isLoaded(id)) {
       setAudioLoaded(true);
-      setLength(audioLogic.getSongLength(audioBuffer.buffer));
-      return;
+      setLength(audioLogic.getSongLengthChannel(id));
     }
   }, [buffer]);
 
   useEffect(() => {
-    if (!audioLoaded || !audioSource || isPaused) {
+    if (!audioLoaded || isPaused) {
       return;
     }
   
@@ -57,30 +43,16 @@ function Turntable({ id, buffer }) {
     return () => {
       clearInterval(interval);
     };
-  }, [audioLoaded, audioSource, isPaused]);
+  }, [audioLoaded, isPaused]);
 
-  //function that returns the time in the format of mm:ss
+  /**
+   * Function that returns the current time of the audio source in the format of m:ss
+   * @returns A string that represents the current time of the audio source in the format of m:ss
+   */
   function getTime() {
     const minutes = Math.floor(time / 60);
     const seconds = time % 60;
     return `${minutes}:${seconds < 10 ? "0" + seconds : seconds}`;
-  }
-
-
-  /**
-   * Function that creates a new source node with the audio buffer set 
-   * to the audio buffer of this turntable.
-   * @returns a new source node with the audio buffer set to the audio buffer of this turntable
-   */
-  function createNewSourceNode() {
-    if (!audioLoaded || !audioBuffer) {
-      return;
-    }
-    const sourceNode = audioLogic.audioContext.createBufferSource();
-    sourceNode.buffer = audioBuffer.buffer;
-    setAudioSource(sourceNode);
-    audioLogic.connectAudioSource(sourceNode, id);
-    sourceNode.start();
   }
 
   /**
@@ -95,14 +67,14 @@ function Turntable({ id, buffer }) {
     }
 
     if (isPaused) {
-      createNewSourceNode();
-      audioLogic.getBPM(audioBuffer.buffer).then((bpm) => {
+      audioLogic.connectShifter(id);
+      audioLogic.getBPM(id).then((bpm) => {
         setBpm(bpm.bpm);
       });
+      audioLogic.playSong(id);
       setTime(0);
     } else {
-      audioSource.stop();
-      audioLogic.disconnectAudioSource(audioSource);
+      audioLogic.pauseSong(id);
     }
 
     //toggle the spinning animation
@@ -117,8 +89,17 @@ function Turntable({ id, buffer }) {
       return;
     }
 
-    //Call the matchBpm function in the audio logic
-    audioLogic.matchBpm(id, audioSource)
+    if (isSynchronized) {
+      audioLogic.resetBpm(id);
+      audioLogic.getBPM(id).then((bpm) => {
+        setBpm(bpm.bpm);
+      });
+      setIsSynchronized(!isSynchronized);
+      return;
+    }
+
+
+     audioLogic.matchBpm(id)
     .then(targetBpm => {
       setBpm(targetBpm);
       setIsSynchronized(!isSynchronized);
@@ -137,7 +118,7 @@ function Turntable({ id, buffer }) {
         <img src={sampleImg} />
       </div>
 
-      {audioBuffer && <h1 className="green-text mt-[15px]">{audioBuffer.name} - {getTime()}/{length}</h1>}
+      {buffer && <h1 className="green-text mt-[15px]">{buffer.name} - {getTime()}/{length}</h1>}
       <div className="bpm-display">
         <div className="round-button" onClick={togglePause}>
           {!isPaused && <FontAwesomeIcon icon={faPause} size="xl" />}

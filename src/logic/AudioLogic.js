@@ -1,4 +1,5 @@
 import { guess } from 'web-audio-beat-detector';
+import { PitchShifter } from 'soundtouchjs';
 
 /**
  * Class that handles the audio logic.
@@ -7,10 +8,11 @@ class AudioLogic {
 
   constructor() {
     this.audioContext = new AudioContext();
-    this.isPlaying = false;
     this.audioBufferLeft = null;
     this.audioBufferRight = null;
     this.audioBufferList = [];
+    this.shifterLeft = null;
+    this.shifterRight = null;
 
     // Create a gain node for each channel and connect them to the destination
     this.gainNodeLeft = this.audioContext.createGain();
@@ -49,33 +51,14 @@ class AudioLogic {
     });
   }
 
-
-
   /**
-   * Plays the audio context if it is not already playing.
-   */
-  play() {
-    // Start the audio context if not already running
-    if (this.audioContext.state === "suspended") {
-      this.audioContext.resume();
-    }
-    this.isPlaying = true;
-  }
-
-  /**
-   * Pauses the audio context if it is playing.
-   */
-  pause() {
-    this.isPlaying = false;
-  }
-
-  /**
-   * Returns the BPM & offset of the audio source.
-   * @param {*} audioSource audio source to get the BPM & offset from
+   * Returns the BPM & offset of the audio buffer.
+   * @param {*} audioBuffer audio buffer to get the BPM & offset from
    * @returns promise that resolves to an object with bpm and offset properties
    */
-  getBPM(audioSource) {
-    return guess(audioSource);
+  getBPM(channel) {
+    const buffer = channel === "left" ? this.audioBufferLeft : this.audioBufferRight;
+    return guess(buffer.buffer);
   }
 
   /**
@@ -84,52 +67,52 @@ class AudioLogic {
    * @param {*} channel channel to set the audio buffer for ("left" or "right")
    */
   setAudioBuffer(audioBuffer, channel) {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       if (channel === "left") {
         this.audioBufferLeft = audioBuffer;
-        resolve();
       } else {
         this.audioBufferRight = audioBuffer;
-        resolve();
       }
+      resolve();
     });
   }
 
-  /**
-   * Function that gets the audio buffer for the specified channel.
-   * @param {*} channel channel to get the audio buffer from ("left" or "right")
-   * @returns the audio buffer for the specified channel
-   */
-  getAudioBuffer(channel) {
-    if (channel === "left") {
-      return this.audioBufferLeft;
-    }
-    return this.audioBufferRight;
+  isLoaded(channel) {
+    return channel === "left" ? this.audioBufferLeft !== null : this.audioBufferRight !== null;
   }
-
+  
   /**
    * Connects the audio source to the specified channel.
    * @param {*} source audio source to connect
    * @param {*} channel channel to connect to ("left" or "right")
    */
-  connectAudioSource(source, channel) {
+  connectShifter(channel) {
+    if (channel === "left" && this.audioBufferLeft !== null) {
+      this.shifterLeft = new PitchShifter(this.audioContext, this.audioBufferLeft.buffer, 1024);
+      this.shifterLeft.tempo = 1;
+      this.shifterLeft.pitch = 1;
+    } else if (channel === "right" && this.audioBufferRight !== null) {
+      this.shifterRight = new PitchShifter(this.audioContext, this.audioBufferRight.buffer, 1024);
+      this.shifterRight.tempo = 1;
+      this.shifterRight.pitch = 1;
+    }
+  }
+
+  playSong(channel) {
     if (channel === "left") {
-      source.connect(this.analyserNodeLeft);
+      this.shifterLeft.connect(this.analyserNodeLeft);
       return;
     }
-    source.connect(this.analyserNodeRight);
+    this.shifterRight.connect(this.analyserNodeRight);
+  }
+
+  pauseSong(channel) {
+    const shifter = channel === "left" ? this.shifterLeft : this.shifterRight;
+    shifter.disconnect();
   }
 
   /**
-   * Disconnects the audio source.
-   * @param {*} source audio source to disconnect
-   */
-  disconnectAudioSource(source) {
-    source.disconnect();
-  }
-
-  /**
-   * Gets the song length in minutes and seconds.
+   * Gets the song length in minutes and seconds for the specified buffer.
    * @param {*} audioBuffer  
    * @returns a string with the length in the format "minutes:seconds"
    */
@@ -144,6 +127,16 @@ class AudioLogic {
   }
 
   /**
+   * Gets the song length in minutes and seconds for the specified channel.
+   * @param {*} channel channel to get the song length from ("left" or "right") 
+   * @returns a string with the length in the format "minutes:seconds" 
+   */
+  getSongLengthChannel(channel) {
+    const buffer = channel === "left" ? this.audioBufferLeft.buffer : this.audioBufferRight.buffer;
+    return this.getSongLength(buffer);
+  }
+
+  /**
    * Crossfades between the left and right channels.
    * @param {*} value value between 0 and 1 (0 = left, 1 = right)
    */
@@ -151,7 +144,6 @@ class AudioLogic {
     // Use an equal-power crossfading curve:
     const gain1 = Math.cos(value * 0.5 * Math.PI);
     const gain2 = Math.cos((1.0 - value) * 0.5 * Math.PI);
-
     this.gainNodeLeft.gain.value = gain1;
     this.gainNodeRight.gain.value = gain2;
   }
@@ -162,7 +154,7 @@ class AudioLogic {
    * @param {*} source audio source to match the BPM of 
    * @returns a promise that resolves to the updated BPM
    */
-  matchBpm(channel, source) {
+  matchBpm(channel) {
     if (!this.audioBufferLeft || !this.audioBufferRight) {
       return Promise.resolve(null);
     }
@@ -170,17 +162,29 @@ class AudioLogic {
     const targetBpmBuffer = channel === "left" ? this.audioBufferRight.buffer : this.audioBufferLeft.buffer;
     const sourceBpmBuffer = channel === "left" ? this.audioBufferLeft.buffer : this.audioBufferRight.buffer;
   
-    const targetBpmPromise = this.getBPM(targetBpmBuffer);
-    const sourceBpmPromise = this.getBPM(sourceBpmBuffer);
+    const targetBpmPromise = guess(targetBpmBuffer);
+    const sourceBpmPromise = guess(sourceBpmBuffer);
   
     return Promise.all([targetBpmPromise, sourceBpmPromise]).then(([targetBpmResult, sourceBpmResult]) => {
       const targetBpm = targetBpmResult.bpm;
       const sourceBpm = sourceBpmResult.bpm;
-  
       const ratio = targetBpm / sourceBpm;
-      source.playbackRate.value = ratio;
+
+      if (channel === "left") {
+        this.shifterLeft.tempo = ratio;
+      } else {
+        this.shifterRight.tempo = ratio;
+      }
       return targetBpm;
     });
-  }  
+  }
+
+  resetBpm(channel) {
+    if (channel === "left") {
+      this.shifterLeft.tempo = 1;
+    } else {
+      this.shifterRight.tempo = 1;
+    }
+  }
 }
 export default AudioLogic;
