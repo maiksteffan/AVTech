@@ -29,6 +29,7 @@ export default function () {
         maxFileSize={10000000}
         customUpload
         uploadHandler={handleUpload}
+        auto
         emptyTemplate={
           <p className="m-0">Drag and drop files to here to upload.</p>
         }
