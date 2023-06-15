@@ -7,7 +7,7 @@ import { faCirclePlay} from "@fortawesome/free-solid-svg-icons";
 function Tracklist(props) {
   const audioLogic = useContext(AudioLogicContext);
 
-  function handlePlay(buffer, id) {
+  function handlePlay(buffer) {
     audioLogic.setAudioBuffer(buffer, props.id);
     props.setAudioBuffer(buffer);
   }
@@ -21,7 +21,7 @@ function Tracklist(props) {
             <li className="track" key={index}>
               {audioBuffer.name} -{" "}
               {audioLogic.getSongLength(audioBuffer.buffer)}
-              <a onClick={() => handlePlay(audioBuffer, props.id)}  className="ml-2 ">
+              <a onClick={() => handlePlay(audioBuffer)}  className="ml-2 ">
                 <FontAwesomeIcon icon={faCirclePlay} style={{color: "#0ac97a",}} />
               </a>
             </li>
