@@ -1,6 +1,7 @@
 import React, { createContext, useState } from 'react';
 import AudioLogic from './AudioLogic';
 import { Button } from "primereact/button";
+import { Link } from 'react-router-dom';
 
 export const AudioLogicContext = createContext();
 
@@ -14,7 +15,7 @@ export const AudioLogicProvider = ({ children }) => {
   if (!audioLogic) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <Button className='w-[300px]' onClick={startAudio}  label="Start" outlined />
+        <Link to="/config"><Button className='w-[300px]' onClick={startAudio}  label="Start" outlined /></Link>
       </div>
     );
   }
