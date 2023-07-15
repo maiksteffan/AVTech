@@ -14,6 +14,8 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.8.0",
+    "react-rotary-knob": "^3.0.3",
+    "react-rotary-knob-skin-pack": "^1.0.2",
     "react-scripts": "5.0.1",
     "soundtouchjs": "^0.1.30",
     "web-audio-beat-detector": "^8.1.48",
