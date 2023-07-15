@@ -1,5 +1,6 @@
 import { guess } from 'web-audio-beat-detector';
 import { PitchShifter } from 'soundtouchjs';
+import { parse } from '@fortawesome/fontawesome-svg-core';
 
 /**
  * Class that handles the audio logic.
@@ -25,6 +26,31 @@ class AudioLogic {
     this.analyserNodeRight = this.audioContext.createAnalyser();
     this.analyserNodeLeft.connect(this.gainNodeLeft);
     this.analyserNodeRight.connect(this.gainNodeRight);
+
+    //Filter setup
+    this.filterHighLeft = this.audioContext.createBiquadFilter();
+    this.filterHighLeft.type = "highshelf";
+    this.filterMidLeft = this.audioContext.createBiquadFilter();
+    this.filterMidLeft.type = "peaking";
+    this.filterLowLeft = this.audioContext.createBiquadFilter();
+    this.filterLowLeft.type = "lowshelf";
+    this.filterHighLeft.connect(this.filterMidLeft);
+    this.filterMidLeft.connect(this.filterLowLeft);
+    this.filterLowLeft.connect(this.analyserNodeLeft);
+
+    this.filterHighRight = this.audioContext.createBiquadFilter();
+    this.filterHighRight.type = "highshelf";
+    this.filterMidRight = this.audioContext.createBiquadFilter();
+    this.filterMidRight.type = "peaking";
+    this.filterLowRight = this.audioContext.createBiquadFilter();
+    this.filterLowRight.type = "lowshelf";
+    this.filterHighRight.connect(this.filterMidRight);
+    this.filterMidRight.connect(this.filterLowRight);
+    this.filterLowRight.connect(this.analyserNodeRight);
+
+    this.setLowPassGain = this.setLowPassGain.bind(this);
+    this.setMidPassGain = this.setMidPassGain.bind(this);
+    this.setHighPassGain = this.setHighPassGain.bind(this);
   }
 
   /**
@@ -88,15 +114,45 @@ class AudioLogic {
   }
 
   /**
+   * Setter for high pass filter gain
+   * @param {*} channel channel to change the filter gain of ("left" or "right") 
+   * @param {*} value target gain value
+   */
+  setHighPassGain(channel, value) {
+    const filter = channel === "left" ? this.filterMidLeft : this.filterMidRight;
+    filter.gain.value = value;
+  }
+
+  /**
+   * Setter for mid pass filter gain
+   * @param {*} channel channel to change the filter gain of ("left" or "right") 
+   * @param {*} value target gain value
+   */
+  setMidPassGain(channel, value) {
+    const filter = channel === "left" ? this.filterMidLeft : this.filterMidRight;
+    filter.gain.value = value;
+  }
+
+  /**
+   * Setter for low pass filter gain
+   * @param {*} channel channel to change the filter gain of ("left" or "right") 
+   * @param {*} value target gain value
+   */
+  setLowPassGain(channel, value) {
+    const filter = channel === "left" ? this.filterLowLeft : this.filterLowRight;
+    filter.gain.value = value;
+  }
+
+  /**
    * Function thats plays the song on the specified channel.
    * @param {*} channel channel to play the song on ("left" or "right") 
    */
   playSong(channel) {
     if (channel === "left") {
-      this.shifterLeft.connect(this.analyserNodeLeft);
+      this.shifterLeft.connect(this.filterHighLeft);
       return;
     }
-    this.shifterRight.connect(this.analyserNodeRight);
+    this.shifterRight.connect(this.filterHighRight);
   }
 
   /**
