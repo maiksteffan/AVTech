@@ -95,7 +95,7 @@ class AudioLogic {
   }
 
   /**
-   * Function that sets the audio buffer for the specified channel. 
+   * Function that sets the audio buffer for the specified channel.
    * @param {*} audioBuffer audio buffer to set
    * @param {*} channel channel to set the audio buffer for ("left" or "right")
    */
@@ -115,7 +115,7 @@ class AudioLogic {
 
   /**
    * Setter for high pass filter gain
-   * @param {*} channel channel to change the filter gain of ("left" or "right") 
+   * @param {*} channel channel to change the filter gain of ("left" or "right")
    * @param {*} value target gain value
    */
   setHighPassGain(channel, value) {
@@ -125,7 +125,7 @@ class AudioLogic {
 
   /**
    * Setter for mid pass filter gain
-   * @param {*} channel channel to change the filter gain of ("left" or "right") 
+   * @param {*} channel channel to change the filter gain of ("left" or "right")
    * @param {*} value target gain value
    */
   setMidPassGain(channel, value) {
@@ -135,7 +135,7 @@ class AudioLogic {
 
   /**
    * Setter for low pass filter gain
-   * @param {*} channel channel to change the filter gain of ("left" or "right") 
+   * @param {*} channel channel to change the filter gain of ("left" or "right")
    * @param {*} value target gain value
    */
   setLowPassGain(channel, value) {
@@ -145,7 +145,7 @@ class AudioLogic {
 
   /**
    * Function thats plays the song on the specified channel.
-   * @param {*} channel channel to play the song on ("left" or "right") 
+   * @param {*} channel channel to play the song on ("left" or "right")
    */
   playSong(channel) {
     if (channel === "left") {
@@ -157,7 +157,7 @@ class AudioLogic {
 
   /**
    * Function that pauses the song on the specified channel.
-   * @param {*} channel channel to pause the song on ("left" or "right") 
+   * @param {*} channel channel to pause the song on ("left" or "right")
    */
   pauseSong(channel) {
     const shifter = channel === "left" ? this.shifterLeft : this.shifterRight;
@@ -179,19 +179,19 @@ class AudioLogic {
   /**
    * Function that matches the BPM of the source to the target.
    * @param {*} channel channel to match the BPM of ("left" or "right")
-   * @param {*} source audio source to match the BPM of 
+   * @param {*} source audio source to match the BPM of
    * @returns a promise that resolves to the updated BPM
    */
   matchBpm(channel) {
     if (!this.audioBufferLeft || !this.audioBufferRight) {
       return Promise.resolve(null);
     }
-  
+
     const targetBpmBuffer = channel === "left" ? this.audioBufferRight.buffer : this.audioBufferLeft.buffer;
     const sourceBpmBuffer = channel === "left" ? this.audioBufferLeft.buffer : this.audioBufferRight.buffer;
     const targetBpmPromise = guess(targetBpmBuffer);
     const sourceBpmPromise = guess(sourceBpmBuffer);
-  
+
     return Promise.all([targetBpmPromise, sourceBpmPromise]).then(([targetBpmResult, sourceBpmResult]) => {
       const targetBpm = targetBpmResult.bpm;
       const sourceBpm = sourceBpmResult.bpm;
@@ -208,7 +208,7 @@ class AudioLogic {
 
   /**
    * Function that resets the BPM of the specified channel to 1.
-   * @param {*} channel channel to reset the BPM of ("left" or "right") 
+   * @param {*} channel channel to reset the BPM of ("left" or "right")
    */
   resetBpm(channel) {
     if (channel === "left") {
@@ -220,7 +220,7 @@ class AudioLogic {
 
   /**
    * Gets the song length in minutes and seconds for the specified buffer.
-   * @param {*} audioBuffer  
+   * @param {*} audioBuffer
    * @returns a string with the length in the format "minutes:seconds"
    */
   getSongLength(audioBuffer) {
@@ -235,8 +235,8 @@ class AudioLogic {
 
   /**
    * Gets the song length in minutes and seconds for the specified channel.
-   * @param {*} channel channel to get the song length from ("left" or "right") 
-   * @returns a string with the length in the format "minutes:seconds" 
+   * @param {*} channel channel to get the song length from ("left" or "right")
+   * @returns a string with the length in the format "minutes:seconds"
    */
   getSongLengthChannel(channel) {
     const buffer = channel === "left" ? this.audioBufferLeft.buffer : this.audioBufferRight.buffer;
@@ -251,6 +251,11 @@ class AudioLogic {
    getBPM(channel) {
     const buffer = channel === "left" ? this.audioBufferLeft : this.audioBufferRight;
     return guess(buffer.buffer);
+  }
+
+  getAnalyser(chanel){
+    const analyser = chanel === "left"? this.analyserNodeLeft : this.analyserNodeRight;
+    return analyser;
   }
 }
 export default AudioLogic;

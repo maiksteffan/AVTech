@@ -5,6 +5,8 @@ import { AudioLogicContext } from "./../logic/AudioLogicContext";
 import "./Turntable.css";
 import sampleSoundwave from "./../assets/soundwave.PNG";
 import sampleImg from "./../assets/sampleImg.png";
+import SongVisualization from "../SongVisualization";
+import SoundWave from "./SoundWave";
 
 function Turntable({ id, buffer }) {
   const [isPaused, setIsPaused] = useState(true);
@@ -35,11 +37,11 @@ function Turntable({ id, buffer }) {
     if (!audioLoaded || isPaused) {
       return;
     }
-  
+
     const interval = setInterval(() => {
       setTime(prevTime => prevTime + 1);
-    }, 1000); 
-  
+    }, 1000);
+
     return () => {
       clearInterval(interval);
     };
@@ -112,7 +114,8 @@ function Turntable({ id, buffer }) {
   return (
     <div className="turntable-container">
       <div className="sound-wave-display">
-        <img src={sampleSoundwave} />
+        <SongVisualization audioLogic={audioLogic} time={time}/>
+        <SoundWave analyserNode={audioLogic.getAnalyser(id)}/>
       </div>
       <div className={`disc ${discClass}`}>
         <img src={sampleImg} />
