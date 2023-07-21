@@ -114,7 +114,7 @@ function Turntable({ id, buffer }) {
   return (
     <div className="turntable-container">
       <div className="sound-wave-display">
-        <SongVisualization audioLogic={audioLogic} time={time}/>
+        <SongVisualization audioLogic={audioLogic} time={time} channel={id}/>
         <SoundWave analyserNode={audioLogic.getAnalyser(id)}/>
       </div>
       <div className={`disc ${discClass}`}>

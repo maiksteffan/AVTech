@@ -1,13 +1,13 @@
 import React, { useEffect, useRef } from 'react';
 
-function SongVisualization({ audioLogic, time}) {
+function SongVisualization({ audioLogic, time, channel}) {
     const canvasRef = useRef(null);
+    const audioBuffer = audioLogic.getAudioBuffer(channel);
 
     useEffect(() => {
         console.log(time);
         const canvas = canvasRef.current;
         const context = canvas.getContext('2d');
-        const audioBuffer = audioLogic.audioBufferLeft.buffer;
 
         const draw = () => {
             const width = canvas.width;
@@ -60,7 +60,7 @@ function SongVisualization({ audioLogic, time}) {
         };
 
         draw();
-    }, [audioLogic.audioBufferLeft.buffer, time]);
+    }, [time, audioBuffer]);
 
     return <canvas ref={canvasRef} />;
 }
