@@ -26,19 +26,22 @@ function SongVisualization({ audioLogic, time}) {
             let barHeight = 0;
 
             for (let i = 0; i < barCount; i++) {
-                const dataIndex = Math.floor((i / barCount) * bufferLength);
-
+                // Add the current time to the dataIndex calculation
+                // This will change which part of the buffer we look at over time
+                // The modulo operation ensures that we don't try to read outside the buffer
+                const dataIndex = Math.floor(((i + time) / barCount) * bufferLength) % bufferLength;
+            
                 // Calculate the average of the surrounding data points
                 sum = 0;
                 for (let j = dataIndex; j < dataIndex + barWidth; j++) {
-                    sum += Math.abs(audioBuffer.getChannelData(0)[j]); // Assuming mono audio
+                    sum += Math.abs(audioBuffer.getChannelData(0)[j % bufferLength]); // Assuming mono audio
                 }
                 average = sum / barWidth;
                 barHeight = average * height;
-
+            
                 // Set bar color
                 context.fillStyle = `rgb(255, 255, 255)`;
-
+            
                 // Draw the bar
                 context.fillRect(
                     i * (barWidth + barSpacing),
