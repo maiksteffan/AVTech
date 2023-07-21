@@ -257,5 +257,10 @@ class AudioLogic {
     const analyser = chanel === "left"? this.analyserNodeLeft : this.analyserNodeRight;
     return analyser;
   }
+
+  getAudioBuffer(channel){
+    const buffer = channel === "left" ? this.audioBufferLeft : this.audioBufferRight;
+    return buffer.buffer;
+  }
 }
 export default AudioLogic;
