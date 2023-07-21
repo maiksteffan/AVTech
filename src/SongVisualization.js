@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 function SongVisualization({ audioLogic, time}) {
     const canvasRef = useRef(null);
@@ -26,9 +26,7 @@ function SongVisualization({ audioLogic, time}) {
             let barHeight = 0;
 
             for (let i = 0; i < barCount; i++) {
-                // Add the current time to the dataIndex calculation
-                // This will change which part of the buffer we look at over time
-                // The modulo operation ensures that we don't try to read outside the buffer
+                // calculate data index based on time
                 const dataIndex = Math.floor(((i + time) / barCount) * bufferLength) % bufferLength;
             
                 // Calculate the average of the surrounding data points
