@@ -1,9 +1,10 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 function SongVisualization({ audioLogic, time}) {
     const canvasRef = useRef(null);
 
     useEffect(() => {
+        console.log(time);
         const canvas = canvasRef.current;
         const context = canvas.getContext('2d');
         const audioBuffer = audioLogic.audioBufferLeft.buffer;
@@ -47,11 +48,6 @@ function SongVisualization({ audioLogic, time}) {
                 );
             }
 
-            setInterval(function() {
-                // Code to be executed every second
-                console.log(time);
-            }, 1000);
-
             // Draw red vertical line
             const lineX = Math.floor(width / 4);
             context.beginPath();
@@ -63,8 +59,7 @@ function SongVisualization({ audioLogic, time}) {
         };
 
         draw();
-    }, [audioLogic.audioBufferLeft.buffer]);
-
+    }, [audioLogic.audioBufferLeft.buffer, time]);
 
     return <canvas ref={canvasRef} />;
 }
