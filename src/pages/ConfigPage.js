@@ -7,6 +7,10 @@ import { Button } from "primereact/button";
 export default function () {
   const audioLogic = useContext(AudioLogicContext);
 
+  /**
+   * Function that loads demo files from the demo_sounds folder
+   * @param {*} urls An array of urls to the demo files
+   */
   const loadDemoFiles = (urls) => {
     for (let url of urls) {
       fetch(url)
@@ -21,11 +25,19 @@ export default function () {
     }
   };
 
+  /**
+   * Function that handles the upload of files in the file upload component
+   * @param {*} event Event that is triggered when a file is uploaded
+   */
   const handleUpload = (event) => {
     const files = Array.from(event.files);
     handleSaveFiles(files);
   };
 
+  /**
+   * Function that triggers the saving of files in the audioLogic
+   * @param {*} files 
+   */
   const handleSaveFiles = (files) => {
     files.forEach((file) => {
       audioLogic.loadAudioFile(file);
@@ -33,7 +45,12 @@ export default function () {
   };
 
   useEffect(() => {
-    let urls = ["/demo_sounds/demo1.mp3", "/demo_sounds/demo2.mp3"];
+    let urls = [
+      "/demo_sounds/Myke Towers - Almas Gemelas.mp3",
+      "/demo_sounds/Pop Smoke - For The Night.mp3",
+      "/demo_sounds/Pop Smoke - Invincible.mp3",
+      "demo_sounds/Pop Smoke, Lil Tjay - Hello.mp3"
+    ];
     loadDemoFiles(urls);
   }, []);
 
