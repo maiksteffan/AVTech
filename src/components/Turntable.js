@@ -115,11 +115,11 @@ function Turntable({ id, buffer }) {
     <div className="turntable-container">
       <div className="sound-wave-display">
         <SongVisualization audioLogic={audioLogic} time={time} channel={id}/>
-        <SoundWave analyserNode={audioLogic.getAnalyser(id)}/>
       </div>
       <div className={`disc ${discClass}`}>
         <img src={sampleImg} />
       </div>
+
 
       {buffer && <h1 className="green-text mt-[15px]">{buffer.name} - {getTime()}/{length}</h1>}
       <div className="bpm-display">
