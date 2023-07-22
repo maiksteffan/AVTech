@@ -7,27 +7,27 @@ import { faCirclePlay} from "@fortawesome/free-solid-svg-icons";
 function Tracklist(props) {
   const audioLogic = useContext(AudioLogicContext);
 
-  function handlePlay(buffer) {
-    audioLogic.setAudioBuffer(buffer, props.id);
-    props.setAudioBuffer(buffer);
+  function handlePlay(song) {
+    audioLogic.setSong(song, props.id);
+    props.setSong(song);
   }
 
   return (
-    <div className="tracklist-container mt-10">
-      <h2 className="tracklist-heading font-bold my-3">Tracklist</h2>
-      <ul className="text-center">
-        {audioLogic.audioBufferList &&
-          audioLogic.audioBufferList.map((audioBuffer, index) => (
-            <li className="track" key={index}>
-              {audioBuffer.name} -{" "}
-              {audioLogic.getSongLength(audioBuffer.buffer)}
-              <a onClick={() => handlePlay(audioBuffer)}  className="ml-2 ">
+    <div className="mt-5 tracklist-container">
+      <h2 className="my-3 font-bold tracklist-heading">Tracklist</h2>
+      <ul className="mx-auto w-[80%]">
+        {audioLogic.songList &&
+          audioLogic.songList.map((song, index) => (
+            <li className="flex flex-row justify-between track" key={index}>
+              {song.name} -{" "}
+              {audioLogic.getSongLength(song.buffer)}
+              <a onClick={() => handlePlay(song)}  className="ml-2 ">
                 <FontAwesomeIcon icon={faCirclePlay} style={{color: "#0ac97a",}} />
               </a>
             </li>
           ))}
       </ul>
-    </div>
+      </div>
   );
 }
 export default Tracklist;

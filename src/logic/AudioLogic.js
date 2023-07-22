@@ -1,17 +1,17 @@
-import { guess } from 'web-audio-beat-detector';
-import { PitchShifter } from 'soundtouchjs';
-import { parse } from '@fortawesome/fontawesome-svg-core';
+import { guess } from "web-audio-beat-detector";
+import { PitchShifter } from "soundtouchjs";
+import { parse } from "@fortawesome/fontawesome-svg-core";
+import Song from "./Song";
 
 /**
  * Class that handles the audio logic.
  */
 class AudioLogic {
-
   constructor() {
     this.audioContext = new AudioContext();
-    this.audioBufferLeft = null;
-    this.audioBufferRight = null;
-    this.audioBufferList = [];
+    this.songLeft = null;
+    this.songRight = null;
+    this.songList = [];
     this.shifterLeft = null;
     this.shifterRight = null;
 
@@ -64,12 +64,13 @@ class AudioLogic {
       reader.onload = () => {
         this.audioContext.decodeAudioData(reader.result).then((audioBuffer) => {
           const fileNameWithoutFormat = file.name.split('.').slice(0, -1).join('.');
-          this.audioBufferList.push({buffer: audioBuffer, name: fileNameWithoutFormat});
+          const song = new Song(fileNameWithoutFormat, audioBuffer);
+          this.songList.push(song);
           resolve(audioBuffer);
-          if (this.audioBufferLeft === null) {
-          this.setAudioBuffer({buffer: audioBuffer, name: fileNameWithoutFormat}, "left");
-          } else if (this.audioBufferRight === null) {
-            this.setAudioBuffer({buffer: audioBuffer, name: fileNameWithoutFormat}, "right");
+          if (this.songLeft === null) {
+            this.songLeft = song;
+          } else if (this.songRight === null) {
+            this.songRight = song;
           }
         });
       };
@@ -84,33 +85,40 @@ class AudioLogic {
    */
   connectShifter(channel) {
     if (channel === "left" && this.audioBufferLeft !== null) {
-      this.shifterLeft = new PitchShifter(this.audioContext, this.audioBufferLeft.buffer, 1024);
+      this.shifterLeft = new PitchShifter(
+        this.audioContext,
+        this.songLeft.buffer,
+        1024
+      );
       this.shifterLeft.tempo = 1;
       this.shifterLeft.pitch = 1;
     } else if (channel === "right" && this.audioBufferRight !== null) {
-      this.shifterRight = new PitchShifter(this.audioContext, this.audioBufferRight.buffer, 1024);
+      this.shifterRight = new PitchShifter(
+        this.audioContext,
+        this.songRight.buffer,
+        1024
+      );
       this.shifterRight.tempo = 1;
       this.shifterRight.pitch = 1;
     }
   }
 
-  /**
-   * Function that sets the audio buffer for the specified channel.
-   * @param {*} audioBuffer audio buffer to set
-   * @param {*} channel channel to set the audio buffer for ("left" or "right")
-   */
-  setAudioBuffer(audioBuffer, channel) {
+  
+  setSong(song, channel) {
     return new Promise((resolve) => {
       if (channel === "left") {
-        this.audioBufferLeft = audioBuffer;
+        this.songLeft = song;
       } else {
-        this.audioBufferRight = audioBuffer;
+        this.songRight = song;
       }
       resolve();
     });
   }
+
   isLoaded(channel) {
-    return channel === "left" ? this.audioBufferLeft !== null : this.audioBufferRight !== null;
+    return channel === "left"
+      ? this.songLeft !== null
+      : this.songRight !== null;
   }
 
   /**
@@ -119,7 +127,8 @@ class AudioLogic {
    * @param {*} value target gain value
    */
   setHighPassGain(channel, value) {
-    const filter = channel === "left" ? this.filterMidLeft : this.filterMidRight;
+    const filter =
+      channel === "left" ? this.filterMidLeft : this.filterMidRight;
     filter.gain.value = value;
   }
 
@@ -129,7 +138,8 @@ class AudioLogic {
    * @param {*} value target gain value
    */
   setMidPassGain(channel, value) {
-    const filter = channel === "left" ? this.filterMidLeft : this.filterMidRight;
+    const filter =
+      channel === "left" ? this.filterMidLeft : this.filterMidRight;
     filter.gain.value = value;
   }
 
@@ -139,7 +149,8 @@ class AudioLogic {
    * @param {*} value target gain value
    */
   setLowPassGain(channel, value) {
-    const filter = channel === "left" ? this.filterLowLeft : this.filterLowRight;
+    const filter =
+      channel === "left" ? this.filterLowLeft : this.filterLowRight;
     filter.gain.value = value;
   }
 
@@ -183,27 +194,35 @@ class AudioLogic {
    * @returns a promise that resolves to the updated BPM
    */
   matchBpm(channel) {
-    if (!this.audioBufferLeft || !this.audioBufferRight) {
+    if (!this.songLeft || !this.songRight) {
       return Promise.resolve(null);
     }
 
-    const targetBpmBuffer = channel === "left" ? this.audioBufferRight.buffer : this.audioBufferLeft.buffer;
-    const sourceBpmBuffer = channel === "left" ? this.audioBufferLeft.buffer : this.audioBufferRight.buffer;
+    const targetBpmBuffer =
+      channel === "left"
+        ? this.songRight.buffer
+        : this.songLeft.buffer;
+    const sourceBpmBuffer =
+      channel === "left"
+        ? this.songLeft.buffer
+        : this.songRight.buffer;
     const targetBpmPromise = guess(targetBpmBuffer);
     const sourceBpmPromise = guess(sourceBpmBuffer);
 
-    return Promise.all([targetBpmPromise, sourceBpmPromise]).then(([targetBpmResult, sourceBpmResult]) => {
-      const targetBpm = targetBpmResult.bpm;
-      const sourceBpm = sourceBpmResult.bpm;
-      const ratio = targetBpm / sourceBpm;
+    return Promise.all([targetBpmPromise, sourceBpmPromise]).then(
+      ([targetBpmResult, sourceBpmResult]) => {
+        const targetBpm = targetBpmResult.bpm;
+        const sourceBpm = sourceBpmResult.bpm;
+        const ratio = targetBpm / sourceBpm;
 
-      if (channel === "left") {
-        this.shifterLeft.tempo = ratio;
-      } else {
-        this.shifterRight.tempo = ratio;
+        if (channel === "left") {
+          this.shifterLeft.tempo = ratio;
+        } else {
+          this.shifterRight.tempo = ratio;
+        }
+        return targetBpm;
       }
-      return targetBpm;
-    });
+    );
   }
 
   /**
@@ -239,28 +258,34 @@ class AudioLogic {
    * @returns a string with the length in the format "minutes:seconds"
    */
   getSongLengthChannel(channel) {
-    const buffer = channel === "left" ? this.audioBufferLeft.buffer : this.audioBufferRight.buffer;
+    const buffer =
+      channel === "left"
+        ? this.songLeft.buffer
+        : this.songRight.buffer;
     return this.getSongLength(buffer);
   }
 
-   /**
+  /**
    * Returns the BPM & offset of the audio buffer.
    * @param {*} audioBuffer audio buffer to get the BPM & offset from
    * @returns promise that resolves to an object with bpm and offset properties
    */
-   getBPM(channel) {
-    const buffer = channel === "left" ? this.audioBufferLeft : this.audioBufferRight;
-    return guess(buffer.buffer);
+  getBPM(channel) {
+    const buffer =
+      channel === "left" ? this.songLeft.buffer : this.songRight.buffer;
+    return guess(buffer);
   }
 
-  getAnalyser(chanel){
-    const analyser = chanel === "left"? this.analyserNodeLeft : this.analyserNodeRight;
+  getAnalyser(chanel) {
+    const analyser =
+      chanel === "left" ? this.analyserNodeLeft : this.analyserNodeRight;
     return analyser;
   }
 
-  getAudioBuffer(channel){
-    const buffer = channel === "left" ? this.audioBufferLeft : this.audioBufferRight;
-    return buffer.buffer;
+  getAudioBuffer(channel) {
+    const buffer =
+      channel === "left" ? this.songLeft.buffer : this.songRight.buffer;
+    return buffer;
   }
 }
 export default AudioLogic;

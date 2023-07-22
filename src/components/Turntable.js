@@ -3,12 +3,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlay, faPause, faRotate } from "@fortawesome/free-solid-svg-icons";
 import { AudioLogicContext } from "./../logic/AudioLogicContext";
 import "./Turntable.css";
-import sampleSoundwave from "./../assets/soundwave.PNG";
 import sampleImg from "./../assets/sampleImg.png";
 import SongVisualization from "../SongVisualization";
-import SoundWave from "./SoundWave";
 
-function Turntable({ id, buffer }) {
+function Turntable({ id, song }) {
   const [isPaused, setIsPaused] = useState(true);
   const [isSynchronized, setIsSynchronized] = useState(false);
   const [audioLoaded, setAudioLoaded] = useState(false);
@@ -31,7 +29,7 @@ function Turntable({ id, buffer }) {
       setAudioLoaded(true);
       setLength(audioLogic.getSongLengthChannel(id));
     }
-  }, [buffer]);
+  }, [song]);
 
   useEffect(() => {
     if (!audioLoaded || isPaused) {
@@ -64,7 +62,7 @@ function Turntable({ id, buffer }) {
    * @returns None
    */
   function togglePause() {
-    if (!audioLoaded || !buffer) {
+    if (!audioLoaded || !song) {
       return;
     }
 
@@ -121,7 +119,7 @@ function Turntable({ id, buffer }) {
       </div>
 
 
-      {buffer && <h1 className="green-text mt-[15px]">{buffer.name} - {getTime()}/{length}</h1>}
+      {song && <h1 className="green-text mt-[15px]">{song.name} - {getTime()}/{length}</h1>}
       <div className="bpm-display">
         <div className="round-button" onClick={togglePause}>
           {!isPaused && <FontAwesomeIcon icon={faPause} size="xl" />}
