@@ -75,6 +75,18 @@ export default function () {
           <Button label="Continue" outlined />
         </Link>
       </div>
+
+      <div className="w-[90%] mt-4">
+        <h2 className="mb-10 text-4xl font-bold green-text">Video Linker</h2>
+        
+        {audioLogic.songList &&
+          audioLogic.songList.map((song, index) => (
+            <div className="flex flex-row items-center justify-between h-12 px-5 mt-1 border border-gray-700 rounded-md track" key={index}>
+              <h2 className="green-text">{song.name}</h2>
+              <button className="rounded-full">Add Video</button>
+            </div>
+          ))}
+      </div>
     </div>
   );
 }
