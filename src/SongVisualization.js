@@ -9,9 +9,14 @@ function SongVisualization({ audioLogic, time, channel}) {
         const canvas = canvasRef.current;
         const context = canvas.getContext('2d');
 
+        //set canvas size
+        canvas.width = 300;
+        canvas.height = 70;
+
         const draw = () => {
             const width = canvas.width;
             const height = canvas.height;
+            const midHeight = height / 2;  // Mid-point of the height
 
             const bufferLength = audioBuffer.length;
 
@@ -27,30 +32,30 @@ function SongVisualization({ audioLogic, time, channel}) {
 
             for (let i = 0; i < barCount; i++) {
                 // calculate data index based on time
-                const dataIndex = Math.floor(((i + time) / barCount) * bufferLength) % bufferLength;
-            
+                const dataIndex = Math.floor((time + (i - barCount / 2)) * bufferLength / width) % bufferLength;
+                
                 // Calculate the average of the surrounding data points
                 sum = 0;
                 for (let j = dataIndex; j < dataIndex + barWidth; j++) {
                     sum += Math.abs(audioBuffer.getChannelData(0)[j % bufferLength]); // Assuming mono audio
                 }
                 average = sum / barWidth;
-                barHeight = average * height;
+                barHeight = average * midHeight;  // Adjusting bar height to half
             
                 // Set bar color
-                context.fillStyle = `rgb(255, 255, 255)`;
+                context.fillStyle = `rgb(54, 57,70)`;
             
-                // Draw the bar
+                // Draw the bar equally up and down from the middle
                 context.fillRect(
                     i * (barWidth + barSpacing),
-                    height - barHeight,
+                    midHeight - (barHeight / 2),
                     barWidth,
                     barHeight
                 );
             }
 
             // Draw red vertical line
-            const lineX = Math.floor(width / 4);
+            const lineX = Math.floor(width / 2);
             context.beginPath();
             context.strokeStyle = 'red';
             context.lineWidth = 2;
@@ -62,8 +67,7 @@ function SongVisualization({ audioLogic, time, channel}) {
         draw();
     }, [time, audioBuffer]);
 
-    return <canvas ref={canvasRef} />;
+    return <canvas className='border border-gray-700 ' ref={canvasRef} />;
 }
 
 export default SongVisualization;
-
