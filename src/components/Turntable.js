@@ -3,10 +3,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlay, faPause, faRotate } from "@fortawesome/free-solid-svg-icons";
 import { AudioLogicContext } from "./../logic/AudioLogicContext";
 import "./Turntable.css";
-import sampleImg from "./../assets/sampleImg.png";
+import sampleImg from "./../assets/disc.png";
 import SongVisualization from "../SongVisualization";
 
-function Turntable({ id, song }) {
+function Turntable({ id, song, setSongPaused }) {
   const [isPaused, setIsPaused] = useState(true);
   const [isSynchronized, setIsSynchronized] = useState(false);
   const [audioLoaded, setAudioLoaded] = useState(false);
@@ -20,6 +20,7 @@ function Turntable({ id, song }) {
     //stop audioSource when song is changed while playing
     if (!isPaused) {
       setIsPaused(true);
+      setSongPaused(true);
       audioLogic.pauseSong(id);
       const disc = document.querySelector(`.${discClass}`);
       disc.classList.toggle("spinning");
@@ -72,9 +73,11 @@ function Turntable({ id, song }) {
         setBpm(bpm.bpm);
       });
       audioLogic.playSong(id);
+      setSongPaused(false);
       setTime(0);
     } else {
       audioLogic.pauseSong(id);
+      setSongPaused(true);
     }
 
     //toggle the spinning animation
@@ -97,8 +100,7 @@ function Turntable({ id, song }) {
       setIsSynchronized(!isSynchronized);
       return;
     }
-
-
+    
      audioLogic.matchBpm(id)
     .then(targetBpm => {
       setBpm(targetBpm);
