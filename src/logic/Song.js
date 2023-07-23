@@ -9,11 +9,20 @@ class Song {
      * @param {*} video Video element of the song
      * @param {int} queuePoint Queue point of the song in seconds
      */
-    constructor(name, buffer, video=null, queuePoint=0) {
+    constructor(name, buffer, video="/demo_videos/defaultVideo.mp4", queuePoint=0) {
         this.name = name; 
         this.buffer = buffer
         this.video = video;
         this.queuePoint = queuePoint;
+    }
+
+    //setter for video
+    setVideo(video) {
+        this.video = video;
+    }
+
+    setIsPlaying(isPaused) {
+        this.isPaused = isPaused;
     }
 }
 export default Song;

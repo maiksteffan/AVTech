@@ -12,6 +12,41 @@ export default function DJVJTool() {
   const audioLogic = useContext(AudioLogicContext);
   const [songLeft, setSongLeft] = useState();
   const [songRight, setSongRight] = useState();
+  const [songLeftPaused, setSongLeftPaused] = useState(true);
+  const [songRightPaused, setSongRightPaused] = useState(true);
+
+  function playVideo() {
+    const video = document.querySelector("video");
+    if (!video) {
+      return;
+    }
+    
+    video.play();
+  }
+
+  function stopVideo() {
+    const video = document.querySelector("video");
+    if (!video) {
+      return;
+    }
+    video.pause();
+  }
+
+  function restartVideo() {
+    const video = document.querySelector("video");
+    video.currentTime = 0;
+  }
+
+  useEffect(() => {
+    if (songLeftPaused) {
+      stopVideo();
+    } else {
+      playVideo();
+    }
+  }
+  ,[songLeftPaused]);
+      
+      
 
   return (
     <div>
@@ -20,8 +55,15 @@ export default function DJVJTool() {
           id="left"
           backgroundImg="./../assets/sampleImg.png"
           song={songLeft}
+          setSongPaused={setSongLeftPaused}
         />
-        <VideoPlayer videoUrl="https://media.istockphoto.com/id/1371473504/video/4k-video-of-flowing-binary-code-in-green-color.mp4?s=mp4-640x640-is&k=20&c=Na3PSkNBQsfJY3I0U58mJ25PEeiFUokeQNj1FAoTI8Y=" />
+        {songLeft ? (
+          <div className="video-container">
+            <video src={songLeft.video} muted loop />
+          </div>
+        ) : (
+          <div className="video-container" />
+        )}
         <Turntable
           id="right"
           backgroundImg="./../assets/sampleImg2.png"
@@ -29,15 +71,9 @@ export default function DJVJTool() {
         />
       </div>
       <div className="dj-controller-bottom">
-        <Tracklist
-          id="left"
-          setSong={setSongLeft}
-        />
+        <Tracklist id="left" setSong={setSongLeft} />
         <Controller />
-        <Tracklist
-          id="right"
-          setSong={setSongRight}
-        />
+        <Tracklist id="right" setSong={setSongRight} />
       </div>
     </div>
   );
