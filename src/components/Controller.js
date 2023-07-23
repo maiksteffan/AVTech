@@ -32,6 +32,7 @@ function Controller(props) {
   const audioLogic = useContext(AudioLogicContext);
 
   function handleCrossfadeChange(event) {
+    props.setCrossfade(event.target.value);
     setCrossfade(event.target.value);
     audioLogic.crossfade(event.target.value);
     setVolumeLeft(1 - event.target.value);
@@ -78,8 +79,8 @@ function Controller(props) {
                 audioLogic.setLowPassGain("left", value);
                 setLowPassFilterLeft(value);
               }}
-              min={-40}
-              max={40}
+              min={-10}
+              max={10}
               value={lowPassFilterLeft}
               skin={skin}
               preciseMode={false}
@@ -91,8 +92,8 @@ function Controller(props) {
                 audioLogic.setMidPassGain("left", value);
                 setMidPassFilterLeft(value);
               }}
-              min={-40}
-              max={40}
+              min={-10}
+              max={10}
               value={midPassFilterLeft}
               skin={skin}
               preciseMode={false}
@@ -103,8 +104,8 @@ function Controller(props) {
                 audioLogic.setHighPassGain("left", value);
                 setHighPassFilterLeft(value);
               }}
-              min={-40}
-              max={40}
+              min={-10}
+              max={10}
               value={highPassFilterLeft}
               skin={skin}
               preciseMode={false}
@@ -115,8 +116,8 @@ function Controller(props) {
                 audioLogic.setHighPassGain("left", value);
                 setHighPassFilterLeft(value);
               }}
-              min={-40}
-              max={40}
+              min={-10}
+              max={10}
               value={highPassFilterLeft}
               skin={skin}
               preciseMode={false}
@@ -129,8 +130,8 @@ function Controller(props) {
                 audioLogic.setLowPassGain("right", value);
                 setLowPassFilterRight(value);
               }}
-              min={-40}
-              max={40}
+              min={-10}
+              max={10}
               value={lowPassFilterRight}
               skin={skin}
               preciseMode={false}
@@ -141,8 +142,8 @@ function Controller(props) {
                 audioLogic.setMidPassGain("right", value);
                 setMidPassFilterRight(value);
               }}
-              min={-40}
-              max={40}
+              min={-10}
+              max={10}
               value={midPassFilterRight}
               skin={skin}
               preciseMode={false}
@@ -153,8 +154,8 @@ function Controller(props) {
                 audioLogic.setHighPassGain("right", value);
                 setHighPassFilterRight(value);
               }}
-              min={-40}
-              max={40}
+              min={-10}
+              max={10}
               value={highPassFilterRight}
               skin={skin}
               preciseMode={false}
@@ -165,8 +166,8 @@ function Controller(props) {
                 audioLogic.setHighPassGain("right", value);
                 setHighPassFilterRight(value);
               }}
-              min={-40}
-              max={40}
+              min={-10}
+              max={10}
               value={highPassFilterRight}
               skin={skin}
               preciseMode={false}
