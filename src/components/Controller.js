@@ -1,4 +1,3 @@
-import "./Controller.css";
 import { useState, useContext } from "react";
 import { AudioLogicContext } from "./../logic/AudioLogicContext";
 import { Knob } from "react-rotary-knob";
@@ -62,8 +61,8 @@ function Controller(props) {
   }
 
   return (
-    <div className="controller-container">
-      <div className="cross-fader-container">
+    <div className="w-[40vw] flex flex-col justify-center items-center">
+      <div className="w-[100%] flex flex-col justify-center items-center">
         <input
           type="range"
           min="0"
@@ -71,10 +70,10 @@ function Controller(props) {
           value={crossfade}
           step="0.01"
           onChange={handleCrossfadeChange}
-          className="cross-fader"
+          className="mb-[50px] mt-[50px]"
         />
       </div>
-      <div className="controller-bottom">
+      <div className="w-[100%] h-[80%] flex flex-row justify-center items-center">
         <input
           type="range"
           min="0"
