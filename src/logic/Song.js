@@ -15,14 +15,5 @@ class Song {
         this.video = video;
         this.queuePoint = queuePoint;
     }
-
-    //setter for video
-    setVideo(video) {
-        this.video = video;
-    }
-
-    setIsPlaying(isPaused) {
-        this.isPaused = isPaused;
-    }
 }
 export default Song;
