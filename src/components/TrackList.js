@@ -1,4 +1,3 @@
-import "./TrackList.css";
 import React, { useContext } from "react";
 import { AudioLogicContext } from "./../logic/AudioLogicContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -20,12 +19,12 @@ function Tracklist(props) {
   }
 
   return (
-    <div className="mt-5 tracklist-container">
-      <h2 className="my-3 font-bold tracklist-heading">Tracklist</h2>
+    <div className="mt-5 h-[45vh] w-[30vw] flex flex-col text-[#0AC97A]">
+      <h2 className="my-3 font-bold text-center">Tracklist</h2>
       <ul className="mx-auto w-[80%]">
         {audioLogic.songList &&
           audioLogic.songList.map((song, index) => (
-            <li className="flex flex-row justify-between track" key={index}>
+            <li className="flex flex-row justify-between mb-[5px] list-none" key={index}>
               {song.name} -{" "}
               {audioLogic.getSongLength(song.buffer)}
               <a onClick={() => handlePlay(song)}  className="ml-2 ">
