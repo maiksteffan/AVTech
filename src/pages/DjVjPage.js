@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect, useRef } from "react";
 import Turntable from "./../components/Turntable";
 import Tracklist from "./../components/TrackList";
 import Controller from "./../components/Controller";
@@ -21,6 +21,7 @@ export default function DJVJTool() {
   const [crossfade, setCrossfade] = useState(0);
   const [filter, setFilter] = useState("");
   let lastFrameTime = Date.now();
+  const animationFrameID = useRef();
 
   //Video player functions
   /**
@@ -58,45 +59,50 @@ export default function DJVJTool() {
    * @param {Filters} filter the filter to be applied to the video
    */
   function drawVideoOnCanvas(videoElement, canvasElement, filter) {
+    
+    // Cancel previous frame to avoid performance issues
+    if (animationFrameID.current) {
+      cancelAnimationFrame(animationFrameID.current);
+    }
 
-  // Calculate the time since the last frame.
-  const now = Date.now();
-  const elapsed = now - lastFrameTime;
-  
-  // Skip the frame if less than 30ms have passed since the last frame (for lowering performance issues)
-  if (elapsed < 30) {
-    requestAnimationFrame(() => 
+    // Calculate the time since the last frame.
+    const now = Date.now();
+    const elapsed = now - lastFrameTime;
+
+    // Skip the frame if less than 30ms have passed since the last frame (for lowering performance issues)
+    if (elapsed < 30) {
+      animationFrameID.current = requestAnimationFrame(() =>
+        drawVideoOnCanvas(videoElement, canvasElement, filter)
+      );
+      return;
+    }
+
+    // Update the last frame time to the current time
+    lastFrameTime = now;
+
+    // Check if the video is ready to be drawn currently
+    if (videoElement.readyState === videoElement.HAVE_ENOUGH_DATA) {
+      const context = canvasElement.getContext("2d");
+      context.clearRect(0, 0, canvasElement.width, canvasElement.height);
+      context.drawImage(
+        videoElement,
+        0,
+        0,
+        canvasElement.width,
+        canvasElement.height
+      );
+
+      // apply filter if it is matching an existing filter in the Filters object
+      if (Filters[filter]) {
+        Filters[filter](context, canvasElement);
+      }
+    }
+
+    // request next frame
+    animationFrameID.current = requestAnimationFrame(() =>
       drawVideoOnCanvas(videoElement, canvasElement, filter)
     );
-    return;
   }
-  
-  // Update the last frame time to the current time
-  lastFrameTime = now;
-  
-  // Check if the video is ready to be drawn currently
-  if (videoElement.readyState === videoElement.HAVE_ENOUGH_DATA) {
-    const context = canvasElement.getContext("2d");
-    context.clearRect(0, 0, canvasElement.width, canvasElement.height);
-    context.drawImage(
-      videoElement,
-      0,
-      0,
-      canvasElement.width,
-      canvasElement.height
-    );
-
-    // apply filter if it is matching an existing filter in the Filters object
-    if (Filters[filter]) {
-      Filters[filter](context, canvasElement);
-    }
-  }
-
-  // request next frame
-  requestAnimationFrame(() =>
-    drawVideoOnCanvas(videoElement, canvasElement, filter)
-  );
-}
 
   /**
    * Function that plays the video of a song.
@@ -187,6 +193,11 @@ export default function DJVJTool() {
     const canvasLeft = document.querySelector("#canvas-left");
     const canvasRight = document.querySelector("#canvas-right");
 
+    // cancel previous frame to avoid performance issues
+    if (animationFrameID.current) {
+      cancelAnimationFrame(animationFrameID.current);
+    }
+
     // restart the drawing of the videos on the canvases with the new filter, if the videos and canvases exist
     if (videoLeft && canvasLeft) {
       drawVideoOnCanvas(videoLeft, canvasLeft, filter);
@@ -194,7 +205,6 @@ export default function DJVJTool() {
     if (videoRight && canvasRight) {
       drawVideoOnCanvas(videoRight, canvasRight, filter);
     }
-  
   }, [filter]);
 
   return (
@@ -208,16 +218,28 @@ export default function DJVJTool() {
         />
         <div id="left" className="relative w-[40vw] h-[25vw]">
           <div className="flex flex-row items-center justify-center gap-5">
-            <button onClick={() => setFilter("grayscaleFilter")} className="px-3 py-1 border border-gray-700 rounded-md hover:bg-slate-800">
+            <button
+              onClick={() => setFilter("grayscaleFilter")}
+              className="px-3 py-1 border border-gray-700 rounded-md hover:bg-slate-800"
+            >
               B/W
             </button>
-            <button onClick={() => setFilter("colorInvertFilter")} className="px-3 py-1 border border-gray-700 rounded-md hover:bg-slate-800">
+            <button
+              onClick={() => setFilter("colorInvertFilter")}
+              className="px-3 py-1 border border-gray-700 rounded-md hover:bg-slate-800"
+            >
               Invert
             </button>
-            <button onClick={() => setFilter("sepiaFilter")} className="px-3 py-1 border border-gray-700 rounded-md hover:bg-slate-800">
+            <button
+              onClick={() => setFilter("sepiaFilter")}
+              className="px-3 py-1 border border-gray-700 rounded-md hover:bg-slate-800"
+            >
               Sepia
             </button>
-            <button onClick={() => setFilter("barbieFilter")} className="px-3 py-1 border border-gray-700 rounded-md hover:bg-slate-800">
+            <button
+              onClick={() => setFilter("barbieFilter")}
+              className="px-3 py-1 border border-gray-700 rounded-md hover:bg-slate-800"
+            >
               Barbie
             </button>
           </div>
