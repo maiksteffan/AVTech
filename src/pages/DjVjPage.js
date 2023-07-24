@@ -209,7 +209,7 @@ export default function DJVJTool() {
 
   return (
     <div>
-      <div className="dj-controller-container">
+      <div className="flex flex-row justify-around h-[50vh] w-[100vw] m-auto">
         <Turntable
           id="left"
           backgroundImg="./../assets/sampleImg.png"
@@ -263,7 +263,7 @@ export default function DJVJTool() {
           setSongPaused={setSongRightPaused}
         />
       </div>
-      <div className="dj-controller-bottom">
+      <div className="flex">
         <Tracklist id="left" setSong={setSongLeft} />
         <Controller setCrossfade={setCrossfade} />
         <Tracklist id="right" setSong={setSongRight} />
