@@ -16,6 +16,7 @@ export default function DJVJTool() {
   const [songRightPaused, setSongRightPaused] = useState(true);
   const [crossfade, setCrossfade] = useState(0);
   const [filter, setFilter] = useState("");
+  let lastFrameTime = Date.now();
 
   //Video player functions
 
@@ -54,28 +55,45 @@ export default function DJVJTool() {
    * @param {Filters} filter the filter to be applied to the video
    */
   function drawVideoOnCanvas(videoElement, canvasElement, filter) {
-    if (videoElement.readyState === videoElement.HAVE_ENOUGH_DATA) {
-      const context = canvasElement.getContext("2d");
-      context.clearRect(0, 0, canvasElement.width, canvasElement.height);
-      context.drawImage(
-        videoElement,
-        0,
-        0,
-        canvasElement.width,
-        canvasElement.height
-      );
 
-      // apply filter if it exists in the Filters object
-      if (Filters[filter]) {
-        Filters[filter](context, canvasElement);
-      }
-    }
-
-    // request next frame
-    requestAnimationFrame(() =>
+  // Calculate the time since the last frame.
+  const now = Date.now();
+  const elapsed = now - lastFrameTime;
+  
+  // Skip the frame if less than 30ms have passed since the last frame (for lowering performance issues)
+  if (elapsed < 30) {
+    requestAnimationFrame(() => 
       drawVideoOnCanvas(videoElement, canvasElement, filter)
     );
+    return;
   }
+  
+  // Update the last frame time to the current time
+  lastFrameTime = now;
+  
+  // Check if the video is ready to be drawn currently
+  if (videoElement.readyState === videoElement.HAVE_ENOUGH_DATA) {
+    const context = canvasElement.getContext("2d");
+    context.clearRect(0, 0, canvasElement.width, canvasElement.height);
+    context.drawImage(
+      videoElement,
+      0,
+      0,
+      canvasElement.width,
+      canvasElement.height
+    );
+
+    // apply filter if it is matching an existing filter in the Filters object
+    if (Filters[filter]) {
+      Filters[filter](context, canvasElement);
+    }
+  }
+
+  // request next frame
+  requestAnimationFrame(() =>
+    drawVideoOnCanvas(videoElement, canvasElement, filter)
+  );
+}
 
   /**
    * Function that plays the video of a song.
@@ -119,7 +137,7 @@ export default function DJVJTool() {
     video.currentTime = 0;
   }
 
-  //use custom hook to control videos state
+  //use custom hook to control videos state depending on songLeftPaused and songRightPaused
   useVideoControl(songLeftPaused, "left");
   useVideoControl(songRightPaused, "right");
 
@@ -150,7 +168,10 @@ export default function DJVJTool() {
     canvasRight.style.opacity = cosineEase(crossfade);
   }, [crossfade]);
 
-  //useEffect that changes the filter when the filter state changes
+  /**
+   * useEffect hook that changes the filter of the videos depending on the filter state variable
+   * and restarts the drawing of the videos on the canvases with the new filter
+   */
   useEffect(() => {
     // if there are no songs loaded return
     if (!songLeft && !songRight) {
