@@ -5,13 +5,18 @@ import { Link } from "react-router-dom";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
 
+
+/**
+ * Component for the config page
+ */
 export default function () {
   const audioLogic = useContext(AudioLogicContext);
   const [queuePointModalVisible, setQueuePointModalVisible] = useState(false);
   const [linkVideoModalVisible, setLinkVideoModalVisible] = useState(false);
   const [selectedSong, setSelectedSong] = useState(null);
   const [filesLoaded, setFilesLoaded] = useState(true);
-
+  
+  //Array of the demo videos
   const videoList = [
     { name: "Neon Guts", url: "/demo_videos/Neon Guts.mp4" },
     { name: "Search and Rescue", url: "/demo_videos/Search and Rescue.mp4" },
@@ -76,21 +81,32 @@ export default function () {
     loadDemoFiles(urls);
   }, []);
 
+  /**
+   * Function that handles the opening of the queue point modal
+   * @param {*} song the song to add a queue point to
+   */
   function handleQueuePoint(song) {
     setSelectedSong(song);
     setQueuePointModalVisible(true);
   }
 
+  /**
+   * Function that handles the linking of a video to a song
+   * @param {*} song the song to link a video to 
+   */
   function handleLinkVideo(song) {
     setSelectedSong(song);
     setLinkVideoModalVisible(true);
   }
 
+  /**
+   * Function that links a video to a song
+   * @param {*} url the url of the video to link to the song
+   */
   function linkVideo(url) {
     selectedSong.setVideo(url);
     setLinkVideoModalVisible(false);
   }
-  
 
   return (
     <div className="w-[80%] h-[90%] m-auto">

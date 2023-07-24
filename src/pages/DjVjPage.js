@@ -8,6 +8,10 @@ import "./../App.css";
 import Filters from "./../logic/Filters";
 import { AudioLogicContext } from "./../logic/AudioLogicContext";
 
+/**
+ * Component for the DJ/VJ page of the application, that includes the turntables, the tracklists the controller
+ * and the video player and all its logic
+ */
 export default function DJVJTool() {
   const audioLogic = useContext(AudioLogicContext);
   const [songLeft, setSongLeft] = useState();
@@ -19,7 +23,6 @@ export default function DJVJTool() {
   let lastFrameTime = Date.now();
 
   //Video player functions
-
   /**
    * Custom hook that controls the video of a song.
    * @param {boolean} songPaused boolean that indicates if the song is paused or not

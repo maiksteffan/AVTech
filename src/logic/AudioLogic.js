@@ -4,7 +4,7 @@ import { parse } from "@fortawesome/fontawesome-svg-core";
 import Song from "./Song";
 
 /**
- * Class that handles the audio logic.
+ * Class that handles the audio logic
  */
 class AudioLogic {
   constructor() {
@@ -103,7 +103,12 @@ class AudioLogic {
     }
   }
 
-  
+
+  /**
+   * Setter for the song on the specified channel.
+   * @param {*} song the song object to set
+   * @param {*} channel channel to set the song on ("left" or "right")
+   */
   setSong(song, channel) {
     return new Promise((resolve) => {
       if (channel === "left") {
@@ -115,6 +120,11 @@ class AudioLogic {
     });
   }
 
+  /**
+   * Function to check if a song is loaded on the specified channel.
+   * @param {*} channel channel to check ("left" or "right")
+   * @returns true if a song is loaded, false if it isnt loaded
+   */
   isLoaded(channel) {
     return channel === "left"
       ? this.songLeft !== null
@@ -276,12 +286,22 @@ class AudioLogic {
     return guess(buffer);
   }
 
-  getAnalyser(chanel) {
+  /**
+   * Getter for the analyser node of the specified channel.
+   * @param {*} channel channel to get the analyser node from ("left" or "right")
+   * @returns the analyser node of the specified channel
+   */
+  getAnalyser(channel) {
     const analyser =
-      chanel === "left" ? this.analyserNodeLeft : this.analyserNodeRight;
+      channel === "left" ? this.analyserNodeLeft : this.analyserNodeRight;
     return analyser;
   }
 
+  /**
+   * Getter for the audio buffer of the specified channel.
+   * @param {*} channel channel to get the audio buffer from ("left" or "right") 
+   * @returns the audio buffer of the specified channel 
+   */
   getAudioBuffer(channel) {
     const buffer =
       channel === "left" ? this.songLeft.buffer : this.songRight.buffer;

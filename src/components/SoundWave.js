@@ -1,5 +1,9 @@
 import React, { useEffect, useRef } from 'react';
 
+/**
+ * Component for drawing the soundwave of an audio buffer
+ * @param {*} analyserNode the analyserNode of the audio buffer
+ */
 function SoundWave({ analyserNode }) {
     const canvasRef = useRef(null);
 

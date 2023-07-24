@@ -6,6 +6,12 @@ import "./Turntable.css";
 import sampleImg from "./../assets/disc.png";
 import SongVisualization from "../SongVisualization";
 
+/**
+ * Component for the turntable
+ * @param {*} id The channel of the turntable (left or right)
+ * @param {*} song The song that is loaded in the turntable
+ * @param {*} setSongPaused Function that sets the songPaused state in the parent component
+ */
 function Turntable({ id, song, setSongPaused }) {
   const [isPaused, setIsPaused] = useState(true);
   const [isSynchronized, setIsSynchronized] = useState(false);
@@ -16,6 +22,9 @@ function Turntable({ id, song, setSongPaused }) {
   const [time, setTime] = useState(0);
   const discClass = `disc-${id}`;
 
+  /**
+   * useEffect hook that is triggered when the song is changed
+   */
   useEffect(() => {
     //stop audioSource when song is changed while playing
     if (!isPaused) {
@@ -26,12 +35,16 @@ function Turntable({ id, song, setSongPaused }) {
       disc.classList.toggle("spinning");
     }
 
+    //set the audioLoaded state to true and get the length of the song if the song is loaded 
     if (audioLogic.isLoaded(id)) {
       setAudioLoaded(true);
       setLength(audioLogic.getSongLengthChannel(id));
     }
   }, [song]);
 
+  /**
+   * useEffect hook to update the playing time of the audio source
+   */
   useEffect(() => {
     if (!audioLoaded || isPaused) {
       return;
@@ -86,7 +99,9 @@ function Turntable({ id, song, setSongPaused }) {
     setIsPaused(!isPaused);
   }
 
-  //match the bpm of this audio source to that of the other
+  /**
+   * Function that synchronizes the bpm of the turntable with the bpm of the other turntable
+   */
   function sync() {
     if (!audioLoaded) {
       return;

@@ -3,8 +3,10 @@ import { useState, useContext } from "react";
 import { AudioLogicContext } from "./../logic/AudioLogicContext";
 import { Knob } from "react-rotary-knob";
 import * as skins from "react-rotary-knob-skin-pack";
-import { faL } from "@fortawesome/free-solid-svg-icons";
 
+/**
+ * Component for the controller
+ */
 function Controller(props) {
   //State variable for crossfade slider
   const [crossfade, setCrossfade] = useState(0.5);
@@ -31,6 +33,10 @@ function Controller(props) {
   //make audioLogic available
   const audioLogic = useContext(AudioLogicContext);
 
+  /**
+   * Function that handles the change of the crossfade slider
+   * @param {*} event Event that is triggered when the crossfade slider is changed
+   */
   function handleCrossfadeChange(event) {
     props.setCrossfade(event.target.value);
     setCrossfade(event.target.value);
@@ -39,11 +45,19 @@ function Controller(props) {
     setVolumeRight(event.target.value);
   }
 
+  /**
+   * Function that handles the change of the volume slider
+   * @param {*} event Event that is triggered when the volume slider is changed
+   */
   function handleVolumeLeftChange(event) {
     setVolumeLeft(event.target.value);
     audioLogic.gainNodeLeft.gain.value = event.target.value;
   }
 
+  /**
+   * Function that handles the change of the volume slider
+   * @param {*} event Event that is triggered when the volume slider is changed
+   */
   function handleVolumeRightChange(event) {
     setVolumeRight(event.target.value);
     audioLogic.gainNodeRight.gain.value = event.target.value;

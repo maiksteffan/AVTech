@@ -4,9 +4,16 @@ import { AudioLogicContext } from "./../logic/AudioLogicContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCirclePlay} from "@fortawesome/free-solid-svg-icons";
 
+/**
+ * Component to render the tracklist of the songs loaded in the audioLogic
+ */
 function Tracklist(props) {
   const audioLogic = useContext(AudioLogicContext);
 
+  /**
+   * Function that handles the playing of a song, by setting the song in the audioLogic
+   * @param {*} song the song to be played 
+   */
   function handlePlay(song) {
     audioLogic.setSong(song, props.id);
     props.setSong(song);
