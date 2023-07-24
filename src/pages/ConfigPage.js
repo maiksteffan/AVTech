@@ -10,6 +10,8 @@ export default function () {
   const [queuePointModalVisible, setQueuePointModalVisible] = useState(false);
   const [linkVideoModalVisible, setLinkVideoModalVisible] = useState(false);
   const [selectedSong, setSelectedSong] = useState(null);
+  const [filesLoaded, setFilesLoaded] = useState(true);
+
   const videoList = [
     { name: "Neon Guts", url: "/demo_videos/Neon Guts.mp4" },
     { name: "Search and Rescue", url: "/demo_videos/Search and Rescue.mp4" },
@@ -21,20 +23,27 @@ export default function () {
    * @param {*} urls An array of urls to the demo files
    */
   const loadDemoFiles = (urls) => {
+    if (filesLoaded && audioLogic.songList.length > 0)  {
+      return;
+    }
+
+    setFilesLoaded(false);
     if (audioLogic.songList.length == 0) {
-      for (let url of urls) {
-        fetch(url)
+      const fetchPromises = urls.map((url) => {
+        return fetch(url)
           .then((response) => response.blob())
           .then((blob) => {
             const fileName = url.substring(url.lastIndexOf("/") + 1);
             const file = new File([blob], fileName, { type: blob.type });
-            audioLogic.loadAudioFile(file).then((audioBuffer) => {
-              console.log("Audio file loaded!");
-            });
+            return audioLogic.loadAudioFile(file);
           });
-      }
+      });
+  
+      Promise.all(fetchPromises).then(() => {
+        setFilesLoaded(true);
+      });
     }
-  };
+  };  
 
   /**
    * Function that handles the upload of files in the file upload component
@@ -50,9 +59,11 @@ export default function () {
    * @param {*} files
    */
   const handleSaveFiles = (files) => {
+    setFilesLoaded(false);
     files.forEach((file) => {
       audioLogic.loadAudioFile(file);
     });
+    setFilesLoaded(true);
   };
 
   useEffect(() => {
@@ -106,7 +117,7 @@ export default function () {
       <div className="w-[100%] mt-10 border border-gray-700 rounded-md px-5 py-3">
         <h2 className="mb-5 text-4xl font-bold green-text">Song Settings</h2>
 
-        {audioLogic.songList &&
+        {audioLogic.songList && filesLoaded &&
           audioLogic.songList.map((song, index) => (
             <div
               className="flex flex-row items-center justify-between h-12 pl-5 mt-2 border border-gray-700 rounded-md track"
