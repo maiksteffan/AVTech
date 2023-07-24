@@ -73,4 +73,40 @@ body {
   .dj-controller-bottom {
     display: flex;
   }
+
+  .spinning {
+    animation: spin 2s linear infinite;
+  }
+  
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  
+  
+  .round-button {
+    height: 40px;
+    width: 40px;
+    border-radius: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    background-color: #1a1a25;
+    border-radius: 50%;
+    transition: all 0.3s ease-in;
+    box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.1),
+      -10px -10px 10px rgba(26, 26, 37, 0.6);
+  }
+  
+  
+  
+  .round-button:active {
+    box-shadow: inset 10px 10px 10px rgba(0, 0, 0, 0.1),
+      inset -10px -10px 10px rgba(26, 26, 37, 0.6);
+  }
   
