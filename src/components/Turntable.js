@@ -2,7 +2,6 @@ import React, { useContext, useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlay, faPause, faRotate } from "@fortawesome/free-solid-svg-icons";
 import { AudioLogicContext } from "./../logic/AudioLogicContext";
-import "./Turntable.css";
 import sampleImg from "./../assets/disc.png";
 import SongVisualization from "../SongVisualization";
 
@@ -127,17 +126,17 @@ function Turntable({ id, song, setSongPaused }) {
   }
 
   return (
-    <div className="turntable-container">
-      <div className="sound-wave-display">
+    <div className="flex flex-col items-center">
+      <div className="h-[80px] w-[20vw] mb-[30px]">
         <SongVisualization audioLogic={audioLogic} time={time} channel={id}/>
       </div>
-      <div className={`disc ${discClass}`}>
-        <img src={sampleImg} />
+      <div className={`h-[13vw] w-[13vw] rounded-full flex justify-center items-center ${discClass}`}>
+        <img className="rounded-full" src={sampleImg} />
       </div>
 
 
       {song && <h1 className="green-text mt-[15px]">{song.name} - {getTime()}/{length}</h1>}
-      <div className="bpm-display">
+      <div className="text-[#0ac97a] text-center flex flex-row justify-around items-center text-sm">
         <div className="round-button" onClick={togglePause}>
           {!isPaused && <FontAwesomeIcon icon={faPause} size="xl" />}
           {isPaused && <FontAwesomeIcon icon={faPlay} size="xl" />}
