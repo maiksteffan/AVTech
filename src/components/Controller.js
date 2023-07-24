@@ -19,13 +19,11 @@ function Controller(props) {
   const [highPassFilterLeft, setHighPassFilterLeft] = useState(0);
   const [midPassFilterLeft, setMidPassFilterLeft] = useState(0);
   const [lowPassFilterLeft, setLowPassFilterLeft] = useState(0);
-  const [knob1Value, setKnob4Value] = useState(0);
 
   //State variables for values of right filters
   const [highPassFilterRight, setHighPassFilterRight] = useState(0);
   const [midPassFilterRight, setMidPassFilterRight] = useState(0);
   const [lowPassFilterRight, setLowPassFilterRight] = useState(0);
-  const [knob3Value, setKnob5Value] = useState(0);
 
   //Knob skin see http://react-rotary-knob-skins-preview.surge.sh for all available skins
   const skin = skins.s10;
@@ -125,18 +123,6 @@ function Controller(props) {
               preciseMode={false}
               className="mt-[10px]"
             />
-            <Knob
-              onChange={(value) => {
-                audioLogic.setHighPassGain("left", value);
-                setHighPassFilterLeft(value);
-              }}
-              min={-10}
-              max={10}
-              value={highPassFilterLeft}
-              skin={skin}
-              preciseMode={false}
-              className="mt-[10px]"
-            />
           </div>
           <div className="flex-col items-center justify-center gap-10">
             <Knob
@@ -159,18 +145,6 @@ function Controller(props) {
               min={-10}
               max={10}
               value={midPassFilterRight}
-              skin={skin}
-              preciseMode={false}
-              className="mt-[10px]"
-            />
-            <Knob
-              onChange={(value) => {
-                audioLogic.setHighPassGain("right", value);
-                setHighPassFilterRight(value);
-              }}
-              min={-10}
-              max={10}
-              value={highPassFilterRight}
               skin={skin}
               preciseMode={false}
               className="mt-[10px]"
