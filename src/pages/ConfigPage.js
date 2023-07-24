@@ -104,7 +104,7 @@ export default function () {
    * @param {*} url the url of the video to link to the song
    */
   function linkVideo(url) {
-    selectedSong.setVideo(url);
+    selectedSong.video = url;
     setLinkVideoModalVisible(false);
   }
 
