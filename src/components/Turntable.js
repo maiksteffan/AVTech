@@ -42,21 +42,30 @@ function Turntable({ id, song, setSongPaused }) {
   }, [song]);
 
   /**
-   * useEffect hook to update the playing time of the audio source
-   */
-  useEffect(() => {
-    if (!audioLoaded || isPaused) {
-      return;
-    }
+ * useEffect hook to update the playing time of the audio source
+ * if the speed of the audio source changes when matching the bpm, 
+ * the timeout duration will be updated accordingly
+ */
+useEffect(() => {
+  if (!audioLoaded || isPaused) {
+    return;
+  }
+  
+  let timeoutId;
 
-    const interval = setInterval(() => {
-      setTime(prevTime => prevTime + 1);
-    }, 1000);
+  const updateTime = () => {
+    setTime(prevTime => prevTime + 1);
+    const speed = audioLogic.getSpeed(id);
+    console.log(speed);
+    timeoutId = setTimeout(updateTime, 1000/speed);
+  }
 
-    return () => {
-      clearInterval(interval);
-    };
-  }, [audioLoaded, isPaused]);
+  updateTime();
+  
+  return () => {
+    clearTimeout(timeoutId); // clear the timeout when the component unmounts
+  };
+}, [audioLoaded, isPaused, audioLogic, id]);
 
   /**
    * Function that returns the current time of the audio source in the format of m:ss
@@ -86,7 +95,7 @@ function Turntable({ id, song, setSongPaused }) {
       });
       audioLogic.playSong(id);
       setSongPaused(false);
-      setTime(0);
+      setTime(Math.round(song.queuePoint));
     } else {
       audioLogic.pauseSong(id);
       setSongPaused(true);

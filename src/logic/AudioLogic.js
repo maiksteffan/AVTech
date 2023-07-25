@@ -11,6 +11,8 @@ class AudioLogic {
     this.audioContext = new AudioContext();
     this.songLeft = null;
     this.songRight = null;
+    this.speedLeft = 1;
+    this.speedRight = 1;
     this.songList = [];
     this.shifterLeft = null;
     this.shifterRight = null;
@@ -232,8 +234,10 @@ class AudioLogic {
 
         if (channel === "left") {
           this.shifterLeft.tempo = ratio;
+          this.speedLeft = ratio;
         } else {
           this.shifterRight.tempo = ratio;
+          this.speedRight = ratio;
         }
         return targetBpm;
       }
@@ -247,8 +251,10 @@ class AudioLogic {
   resetBpm(channel) {
     if (channel === "left") {
       this.shifterLeft.tempo = 1;
+      this.speedLeft = 1;
     } else {
       this.shifterRight.tempo = 1;
+      this.speedRight = 1;
     }
   }
 
@@ -265,6 +271,16 @@ class AudioLogic {
       seconds = "0" + seconds;
     }
     return minutes + ":" + seconds;
+  }
+
+  /**
+   * Getter for the tempo of the specified channel.
+   * @param {*} channel channel to get the tempo from ("left" or "right") 
+   * @returns the tempo of the specified channel
+   */
+  getSpeed(channel) {
+    const speed = channel === "left" ? this.speedLeft : this.speedRight;
+    return speed;
   }
 
   /**
