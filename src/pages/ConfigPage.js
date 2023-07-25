@@ -5,7 +5,6 @@ import { Link } from "react-router-dom";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
 
-
 /**
  * Component for the config page
  */
@@ -15,7 +14,8 @@ export default function () {
   const [linkVideoModalVisible, setLinkVideoModalVisible] = useState(false);
   const [selectedSong, setSelectedSong] = useState(null);
   const [filesLoaded, setFilesLoaded] = useState(true);
-  
+  const audioRef = useRef();
+
   //Array of the demo videos
   const videoList = [
     { name: "Neon Guts", url: "/demo_videos/Neon Guts.mp4" },
@@ -28,7 +28,7 @@ export default function () {
    * @param {*} urls An array of urls to the demo files
    */
   const loadDemoFiles = (urls) => {
-    if (filesLoaded && audioLogic.songList.length > 0)  {
+    if (filesLoaded && audioLogic.songList.length > 0) {
       return;
     }
 
@@ -43,12 +43,12 @@ export default function () {
             return audioLogic.loadAudioFile(file);
           });
       });
-  
+
       Promise.all(fetchPromises).then(() => {
         setFilesLoaded(true);
       });
     }
-  };  
+  };
 
   /**
    * Function that handles the upload of files in the file upload component
@@ -88,11 +88,27 @@ export default function () {
   function handleQueuePoint(song) {
     setSelectedSong(song);
     setQueuePointModalVisible(true);
+    //wait for the modal to open
+    setTimeout(() => {
+      let audio = audioRef.current;
+      audio.src = "/demo_sounds/" + song.name + ".mp3";
+    }, 100);
+  }
+
+  function setQueuePoint(song) {
+    let audioTime = audioRef.current.currentTime;
+    song.queuePoint = audioTime;
+    setQueuePointModalVisible(false);
+  }
+
+  function resetQueuePoint(song) {
+    song.queuePoint = 0;
+    setQueuePointModalVisible(false);
   }
 
   /**
    * Function that handles the linking of a video to a song
-   * @param {*} song the song to link a video to 
+   * @param {*} song the song to link a video to
    */
   function handleLinkVideo(song) {
     setSelectedSong(song);
@@ -133,7 +149,8 @@ export default function () {
       <div className="w-[100%] mt-10 border border-gray-700 rounded-md px-5 py-3">
         <h2 className="mb-5 text-4xl font-bold green-text">Song Settings</h2>
 
-        {audioLogic.songList && filesLoaded &&
+        {audioLogic.songList &&
+          filesLoaded &&
           audioLogic.songList.map((song, index) => (
             <div
               className="flex flex-row items-center justify-between h-12 pl-5 mt-2 border border-gray-700 rounded-md track"
@@ -193,7 +210,26 @@ export default function () {
         style={{ width: "50vw" }}
         breakpoints={{ "960px": "75vw", "641px": "100vw" }}
       >
-        <p>Set Queue Point</p>
+        {selectedSong && (
+          <p className="mb-1">
+            <strong>{selectedSong.name}</strong>
+          </p>
+        )}
+        { selectedSong && <p className="mb-3">Current queue point = {selectedSong.queuePoint} seconds</p> }
+
+        <audio
+          controls
+          ref={audioRef}
+          src={"/demo_sounds/Myke Towers - Almas Gemelas.mp3"}
+          className="w-full mb-2"
+        ></audio>
+        <p className="mb-2">{"(The queue point will be set to the played time of the audio player)"}</p>
+        <button onClick={() => setQueuePoint(selectedSong)} className="px-3 py-1 mr-3 border border-gray-700 rounded-md hover:bg-slate-800">
+          Set Queue Point
+        </button>
+        <button onClick={() => resetQueuePoint(selectedSong)} className="px-3 py-1 mr-3 border border-gray-700 rounded-md hover:bg-slate-800">
+          Reset Queue Point
+        </button>
       </Dialog>
     </div>
   );

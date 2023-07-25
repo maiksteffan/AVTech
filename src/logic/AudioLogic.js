@@ -85,6 +85,8 @@ class AudioLogic {
    */
   connectShifter(channel) {
     if (channel === "left" && this.audioBufferLeft !== null) {
+      const percentagePlayed = this.songLeft.queuePoint / this.songLeft.buffer.duration;
+
       this.shifterLeft = new PitchShifter(
         this.audioContext,
         this.songLeft.buffer,
@@ -92,7 +94,9 @@ class AudioLogic {
       );
       this.shifterLeft.tempo = 1;
       this.shifterLeft.pitch = 1;
+      this.shifterLeft.percentagePlayed = percentagePlayed;
     } else if (channel === "right" && this.audioBufferRight !== null) {
+      const percentagePlayed = this.songRight.queuePoint / this.songRight.buffer.duration;
       this.shifterRight = new PitchShifter(
         this.audioContext,
         this.songRight.buffer,
@@ -100,6 +104,7 @@ class AudioLogic {
       );
       this.shifterRight.tempo = 1;
       this.shifterRight.pitch = 1;
+      this.shifterRight.percentagePlayed = percentagePlayed;
     }
   }
 
