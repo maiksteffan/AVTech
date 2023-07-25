@@ -62,7 +62,7 @@ function Controller(props) {
 
   return (
     <div className="w-[40vw] flex flex-col justify-center items-center">
-      <div className="w-[100%] flex flex-col justify-center items-center">
+      <div className="w-[100%] h-[20%] flex flex-col justify-center items-center">
         <input
           type="range"
           min="0"
@@ -73,7 +73,7 @@ function Controller(props) {
           className="mb-[50px] mt-[50px]"
         />
       </div>
-      <div className="w-[100%] h-[80%] flex flex-row justify-center items-center">
+      <div className="w-[100%] h-[50%] flex flex-row justify-center items-center">
         <input
           type="range"
           min="0"
