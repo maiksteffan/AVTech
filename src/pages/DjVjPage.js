@@ -7,6 +7,8 @@ import "primereact/resources/primereact.min.css";
 import "./../App.css";
 import Filters from "./../logic/Filters";
 import { AudioLogicContext } from "./../logic/AudioLogicContext";
+import { InputSwitch } from 'primereact/inputswitch';
+        
 
 /**
  * Component for the DJ/VJ page of the application, that includes the turntables, the tracklists the controller
@@ -22,6 +24,9 @@ export default function DJVJTool() {
   const [filter, setFilter] = useState("");
   const animationFrameIDLeft = useRef();
   const animationFrameIDRight = useRef();
+  const [brightnessFilterActive, setBrightnessFilterActive] = useState(false);
+  const [saturationFilterActive, setSaturationFilterActive] = useState(false);
+  const [contrastFilterActive, setContrastFilterActive] = useState(false);
   
   //Video player functions
   /**
@@ -53,6 +58,33 @@ export default function DJVJTool() {
     }, [songPaused, channel]);
   };
 
+  function brightnessFilter(canvas, channel) {
+    let analyser = channel === "left" ? audioLogic.analyserNodeLeft : audioLogic.analyserNodeRight;
+    const frequencyData = new Uint8Array(analyser.frequencyBinCount);
+    analyser.getByteFrequencyData(frequencyData);
+    const avgFrequency = frequencyData.reduce((a, b) => a + b, 0) / frequencyData.length;
+    const context = canvas.getContext("2d");
+    context.filter = `brightness(${avgFrequency}%`;
+  }
+
+  function saturationFilter(canvas, channel) {
+    let analyser = channel === "left" ? audioLogic.analyserNodeLeft : audioLogic.analyserNodeRight;
+    const frequencyData = new Uint8Array(analyser.frequencyBinCount);
+    analyser.getByteFrequencyData(frequencyData);
+    const avgFrequency = frequencyData.reduce((a, b) => a + b, 0) / frequencyData.length;
+    const context = canvas.getContext("2d");
+    context.filter = `saturate(${avgFrequency}%`;
+  }
+
+  function contrastFilter(canvas, channel) {
+    let analyser = channel === "left" ? audioLogic.analyserNodeLeft : audioLogic.analyserNodeRight;
+    const frequencyData = new Uint8Array(analyser.frequencyBinCount);
+    analyser.getByteFrequencyData(frequencyData);
+    const avgFrequency = frequencyData.reduce((a, b) => a + b, 0) / frequencyData.length;
+    const context = canvas.getContext("2d");
+    context.filter = `contrast(${avgFrequency}%`;
+  }
+    
   /**
    * Function that draws the video of a song on a canvas.
    * @param {video} videoElement reference to the video element of the song
@@ -60,11 +92,21 @@ export default function DJVJTool() {
    * @param {Filters} filter the filter to be applied to the video
    */
   function drawVideoOnCanvas(videoElement, canvasElement, filter, channel, lastFrameTime) {
-    
+
     const animationFrameID = channel === "left" ? animationFrameIDLeft : animationFrameIDRight;
     // Cancel previous frame to avoid performance issues
     if (animationFrameID.current) {
       cancelAnimationFrame(animationFrameID.current);
+    }
+
+    if (brightnessFilterActive === true) {
+      brightnessFilter(canvasElement, channel);
+    }
+    if (saturationFilterActive === true) {
+      saturationFilter(canvasElement, channel);
+    }
+    if (contrastFilterActive === true) {
+      contrastFilter(canvasElement, channel);
     }
 
     // Calculate the time since the last frame.
@@ -214,7 +256,7 @@ export default function DJVJTool() {
     if (videoRight && canvasRight) {
       drawVideoOnCanvas(videoRight, canvasRight, filter, "right");
     }
-  }, [filter]);
+  }, [filter, brightnessFilter, saturationFilter, contrastFilter]);
 
   return (
     <div>
@@ -264,6 +306,16 @@ export default function DJVJTool() {
               <canvas id="canvas-right" />
             </div>
           )}
+          <div className="relative flex items-center justify-center top-[48vh]">
+            <InputSwitch checked={brightnessFilterActive} onChange={() => setBrightnessFilterActive(!brightnessFilterActive)} />
+            <label className="ml-2">Brightness</label>
+            
+            <InputSwitch className="ml-4" checked={saturationFilterActive} onChange={() => setSaturationFilterActive(!saturationFilterActive)} />
+            <label className="ml-2">Saturation</label>
+
+            <InputSwitch className="ml-4" checked={contrastFilterActive} onChange={() => setContrastFilterActive(!contrastFilterActive)} />
+            <label className="ml-2">Contrast</label>
+          </div>
         </div>
         <Turntable
           id="right"
