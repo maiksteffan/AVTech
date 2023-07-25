@@ -20,16 +20,17 @@ export default function DJVJTool() {
   const [songRightPaused, setSongRightPaused] = useState(true);
   const [crossfade, setCrossfade] = useState(0);
   const [filter, setFilter] = useState("");
-  let lastFrameTime = Date.now();
-  const animationFrameID = useRef();
-
+  const animationFrameIDLeft = useRef();
+  const animationFrameIDRight = useRef();
+  
   //Video player functions
   /**
    * Custom hook that controls the video of a song.
    * @param {boolean} songPaused boolean that indicates if the song is paused or not
    * @param {String} channel the channel of the song (left or right)
-   */
-  const useVideoControl = (songPaused, channel) => {
+  */
+ const useVideoControl = (songPaused, channel) => {
+    let lastFrameTime = Date.now();
     useEffect(() => {
       if (songPaused) {
         stopVideo(channel);
@@ -47,7 +48,7 @@ export default function DJVJTool() {
         canvas.height = (23 * window.innerWidth) / 100;
         restartVideo(channel);
         playVideo(channel);
-        drawVideoOnCanvas(video, canvas, filter); // Change filter as desired
+        drawVideoOnCanvas(video, canvas, filter, channel, lastFrameTime); // Change filter as desired
       }
     }, [songPaused, channel]);
   };
@@ -58,8 +59,9 @@ export default function DJVJTool() {
    * @param {canvas} canvasElement reference to the canvas element
    * @param {Filters} filter the filter to be applied to the video
    */
-  function drawVideoOnCanvas(videoElement, canvasElement, filter) {
+  function drawVideoOnCanvas(videoElement, canvasElement, filter, channel, lastFrameTime) {
     
+    const animationFrameID = channel === "left" ? animationFrameIDLeft : animationFrameIDRight;
     // Cancel previous frame to avoid performance issues
     if (animationFrameID.current) {
       cancelAnimationFrame(animationFrameID.current);
@@ -72,7 +74,7 @@ export default function DJVJTool() {
     // Skip the frame if less than 30ms have passed since the last frame (for lowering performance issues)
     if (elapsed < 30) {
       animationFrameID.current = requestAnimationFrame(() =>
-        drawVideoOnCanvas(videoElement, canvasElement, filter)
+        drawVideoOnCanvas(videoElement, canvasElement, filter, channel, lastFrameTime)
       );
       return;
     }
@@ -100,7 +102,7 @@ export default function DJVJTool() {
 
     // request next frame
     animationFrameID.current = requestAnimationFrame(() =>
-      drawVideoOnCanvas(videoElement, canvasElement, filter)
+      drawVideoOnCanvas(videoElement, canvasElement, filter, channel, lastFrameTime)
     );
   }
 
@@ -132,6 +134,11 @@ export default function DJVJTool() {
       return;
     }
     video.pause();
+    const animationFrameID = channel === "left" ? animationFrameIDLeft : animationFrameIDRight;
+    // Cancel previous frame to avoid performance issues
+    if (animationFrameID.current) {
+      cancelAnimationFrame(animationFrameID.current);
+    }
   }
 
   /**
@@ -194,16 +201,18 @@ export default function DJVJTool() {
     const canvasRight = document.querySelector("#canvas-right");
 
     // cancel previous frame to avoid performance issues
-    if (animationFrameID.current) {
-      cancelAnimationFrame(animationFrameID.current);
+    if (animationFrameIDLeft.current) {
+      cancelAnimationFrame(animationFrameIDLeft.current);
     }
-
+    if (animationFrameIDRight.current) {
+      cancelAnimationFrame(animationFrameIDRight.current);
+    }
     // restart the drawing of the videos on the canvases with the new filter, if the videos and canvases exist
     if (videoLeft && canvasLeft) {
-      drawVideoOnCanvas(videoLeft, canvasLeft, filter);
+      drawVideoOnCanvas(videoLeft, canvasLeft, filter, "left");
     }
     if (videoRight && canvasRight) {
-      drawVideoOnCanvas(videoRight, canvasRight, filter);
+      drawVideoOnCanvas(videoRight, canvasRight, filter, "right");
     }
   }, [filter]);
 
