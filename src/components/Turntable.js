@@ -34,7 +34,7 @@ function Turntable({ id, song, setSongPaused }) {
       disc.classList.toggle("spinning");
     }
 
-    //set the audioLoaded state to true and get the length of the song if the song is loaded 
+    //set the audioLoaded state to true and get the length of the song if the song is loaded
     if (audioLogic.isLoaded(id)) {
       setAudioLoaded(true);
       setLength(audioLogic.getSongLengthChannel(id));
@@ -42,30 +42,45 @@ function Turntable({ id, song, setSongPaused }) {
   }, [song]);
 
   /**
- * useEffect hook to update the playing time of the audio source
- * if the speed of the audio source changes when matching the bpm, 
- * the timeout duration will be updated accordingly
- */
-useEffect(() => {
-  if (!audioLoaded || isPaused) {
-    return;
-  }
-  
-  let timeoutId;
+   * useEffect hook to update the playing time of the audio source
+   * if the speed of the audio source changes when matching the bpm,
+   * the timeout duration will be updated accordingly
+   */
+  useEffect(() => {
+    if (!audioLoaded || isPaused) {
+      return;
+    }
 
-  const updateTime = () => {
-    setTime(prevTime => prevTime + 1);
-    const speed = audioLogic.getSpeed(id);
-    console.log(speed);
-    timeoutId = setTimeout(updateTime, 1000/speed);
-  }
+    let timeoutId;
+    const updateTime = () => {
+      setTime((prevTime) => prevTime + 1);
+      const speed = audioLogic.getSpeed(id);
+      timeoutId = setTimeout(updateTime, 1000 / speed);
+    };
 
-  updateTime();
-  
-  return () => {
-    clearTimeout(timeoutId); // clear the timeout when the component unmounts
-  };
-}, [audioLoaded, isPaused, audioLogic, id]);
+    updateTime();
+
+    return () => {
+      clearTimeout(timeoutId); // clear the timeout when the component unmounts
+    };
+  }, [audioLoaded, isPaused, audioLogic, id]);
+
+  /**
+   * useEffect hook that pauses the song when the song is finished
+   */
+  useEffect(() => {
+    if (isPaused) {
+      return;
+    }
+
+    if (time >= song.buffer.duration - 1) {
+      setIsPaused(true);
+      setSongPaused(true);
+      audioLogic.pauseSong(id);
+      const disc = document.querySelector(`.${discClass}`);
+      disc.classList.toggle("spinning");
+    }
+  }, [time, song]);
 
   /**
    * Function that returns the current time of the audio source in the format of m:ss
@@ -123,28 +138,34 @@ useEffect(() => {
       setIsSynchronized(!isSynchronized);
       return;
     }
-    
-     audioLogic.matchBpm(id)
-    .then(targetBpm => {
-      setBpm(targetBpm);
-      setIsSynchronized(!isSynchronized);
-    })
-    .catch(error => {
-      console.error("Error:", error);
-    });
+
+    audioLogic
+      .matchBpm(id)
+      .then((targetBpm) => {
+        setBpm(targetBpm);
+        setIsSynchronized(!isSynchronized);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
   }
 
   return (
     <div className="flex flex-col items-center">
       <div className="h-[80px] w-[20vw] mb-[30px]">
-        <SongVisualization audioLogic={audioLogic} time={time} channel={id}/>
+        <SongVisualization audioLogic={audioLogic} time={time} channel={id} />
       </div>
-      <div className={`h-[13vw] w-[13vw] rounded-full flex justify-center items-center ${discClass}`}>
+      <div
+        className={`h-[13vw] w-[13vw] rounded-full flex justify-center items-center ${discClass}`}
+      >
         <img className="rounded-full" src={sampleImg} />
       </div>
 
-
-      {song && <h1 className="green-text mt-[15px]">{song.name} - {getTime()}/{length}</h1>}
+      {song && (
+        <h1 className="green-text mt-[15px]">
+          {song.name} - {getTime()}/{length}
+        </h1>
+      )}
       <div className="text-[#0ac97a] text-center flex flex-row justify-around items-center text-sm">
         <div className="round-button" onClick={togglePause}>
           {!isPaused && <FontAwesomeIcon icon={faPause} size="xl" />}

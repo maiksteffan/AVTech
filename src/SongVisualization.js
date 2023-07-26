@@ -1,11 +1,19 @@
 import React, { useEffect, useRef } from 'react';
 
+/**
+ * Component for the visualization of a song
+ * @param {*} audioLogic The audioLogic object
+ * @param {*} time The current time of the song
+ * @param {*} channel The channel of the song (left or right)
+ */
 function SongVisualization({ audioLogic, time, channel}) {
     const canvasRef = useRef(null);
     const audioBuffer = audioLogic.getAudioBuffer(channel);
 
+    /**
+     * useEffect hook that draws the visualization of the song every time the time changes
+     */
     useEffect(() => {
-        console.log(time);
         const canvas = canvasRef.current;
         const context = canvas.getContext('2d');
 
@@ -13,14 +21,16 @@ function SongVisualization({ audioLogic, time, channel}) {
         canvas.width = 300;
         canvas.height = 70;
 
+        //draw the visualization on the canvas
         const draw = () => {
             const width = canvas.width;
             const height = canvas.height;
-            const midHeight = height / 2;  // Mid-point of the height
+            const midHeight = height / 2;
+            const redLineX = Math.floor(width / 2);
 
             const bufferLength = audioBuffer.length;
 
-            const barCount = Math.ceil(width / 2); // Reduce the number of bars for better performance
+            const barCount = width;
             const barWidth = Math.ceil(width / barCount);
             const barSpacing = 1;
 
@@ -30,37 +40,35 @@ function SongVisualization({ audioLogic, time, channel}) {
             let average = 0;
             let barHeight = 0;
 
+            // Draw the bars onto the canvas
             for (let i = 0; i < barCount; i++) {
-                // calculate data index based on time
-                const dataIndex = Math.floor((time + (i - barCount / 2)) * bufferLength / width) % bufferLength;
-                
-                // Calculate the average of the surrounding data points
+                const relativeIndex = i - Math.floor(barCount / 2);
+                const dataIndex = Math.floor((time + relativeIndex) * bufferLength / width) % bufferLength;
+
                 sum = 0;
                 for (let j = dataIndex; j < dataIndex + barWidth; j++) {
-                    sum += Math.abs(audioBuffer.getChannelData(0)[j % bufferLength]); // Assuming mono audio
+                    sum += Math.abs(audioBuffer.getChannelData(0)[j % bufferLength]); 
                 }
                 average = sum / barWidth;
-                barHeight = average * midHeight;  // Adjusting bar height to half
-            
-                // Set bar color
-                context.fillStyle = `rgb(54, 57,70)`;
-            
-                // Draw the bar equally up and down from the middle
+                barHeight = average * midHeight; 
+
+                context.fillStyle = `rgb(117, 251,253)`;
+
+                const barX = redLineX + (relativeIndex * (barWidth + barSpacing));
                 context.fillRect(
-                    i * (barWidth + barSpacing),
+                    barX,
                     midHeight - (barHeight / 2),
                     barWidth,
                     barHeight
                 );
             }
 
-            // Draw red vertical line
-            const lineX = Math.floor(width / 2);
+            //Drawing of the red line in the middle of the canvas
             context.beginPath();
             context.strokeStyle = 'red';
-            context.lineWidth = 2;
-            context.moveTo(lineX, 0);
-            context.lineTo(lineX, height);
+            context.lineWidth = 1;
+            context.moveTo(redLineX, 0);
+            context.lineTo(redLineX, height);
             context.stroke();
         };
 
